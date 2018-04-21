@@ -3,10 +3,18 @@ import 'dart:html';
 
 import 'package:hades_simulator/common.dart';
 // import 'package:hades_simulator/sector.dart';
+import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
 main() {
   var star = new Star(4);
+
+  var planets = [
+    new Planet(x: star.sectors.first.x, y: star.sectors.first.y),
+    new Planet(x: star.sectors[10].centerX, y: star.sectors[10].centerY),
+  ];
+  star.planets.addAll(planets);
+
   var gameCtx = new GameContext(star: star, scale: 0.2);
   var canvas = new CanvasElement();
 

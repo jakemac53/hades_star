@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:meta/meta.dart';
 
 import 'common.dart';
+import 'planet.dart';
 import 'sector.dart';
 
 class Star extends GameObject {
@@ -19,13 +20,16 @@ class Star extends GameObject {
   @override
   final double width;
 
+  final List<Planet> planets;
+
   final List<Sector> sectors;
 
-  Star._({@required this.sectors, @required this.height, @required this.width});
-
-  // Create a star with [numLayers] layers of hexes making up the overall hex.
-  factory Star(int numLayers) {
-    var sectors = <Sector>[];
+  Star._(
+      {@required this.planets,
+      @required this.height,
+      @required this.width,
+      @required int numLayers})
+      : sectors = <Sector>[] {
     for (var q = -numLayers + 1; q < numLayers; q++) {
       for (var r = -numLayers + 1; r < numLayers; r++) {
         if (q + r < -(numLayers - 1)) continue;
@@ -33,9 +37,13 @@ class Star extends GameObject {
 
         var x = Sector.SIZE * 3 / 2 * q;
         var y = Sector.SIZE * math.sqrt(3) * (r + q / 2);
-        sectors.add(new Sector(x: x, y: y));
+        sectors.add(new Sector(x: x + centerX, y: y + centerY));
       }
     }
+  }
+
+  // Create a star with [numLayers] layers of hexes making up the overall hex.
+  factory Star(int numLayers) {
     var totalHeight = (Sector.HEIGHT * ((numLayers - 1) * 2 + 1));
     var totalWidth = (Sector.WIDTH * ((((numLayers - 1) ~/ 2) * 2) + 1) +
         Sector.WIDTH * 0.5 * (numLayers ~/ 2) * 2);
@@ -43,13 +51,20 @@ class Star extends GameObject {
       totalWidth += (2 * Sector.WIDTH * .25).floor();
     }
 
-    return new Star._(sectors: sectors, height: totalHeight, width: totalWidth);
+    return new Star._(
+        planets: [],
+        numLayers: numLayers,
+        height: totalHeight,
+        width: totalWidth);
   }
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
     for (var sector in sectors) {
       sector.draw(renderCtx, gameCtx);
+    }
+    for (var planet in planets) {
+      planet.draw(renderCtx, gameCtx);
     }
   }
 }

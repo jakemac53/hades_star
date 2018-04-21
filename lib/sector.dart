@@ -29,9 +29,7 @@ class Sector extends GameObject {
       var rad = math.pi / 180 * deg;
       var position = new SimplePosition(
           x: x + SIZE * math.cos(rad), y: y + SIZE * math.sin(rad));
-      return new SimplePosition(
-          x: position.x + gameCtx.star.centerX,
-          y: position.y + gameCtx.star.centerY);
+      return new SimplePosition(x: position.x, y: position.y);
     }
 
     renderCtx.setStrokeColorRgb(255, 255, 255);
