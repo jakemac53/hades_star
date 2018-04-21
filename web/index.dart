@@ -2,21 +2,15 @@ import 'dart:html';
 // import 'dart:math' as math;
 
 import 'package:hades_simulator/common.dart';
-// import 'package:hades_simulator/sector.dart';
+import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
 main() {
   var star = new Star(4);
 
-  var planets = [
-    new Planet(x: star.sectors.first.x, y: star.sectors.first.y),
-    new Planet(x: star.sectors[10].centerX, y: star.sectors[10].centerY),
-  ];
-  star.planets.addAll(planets);
-
-  var gameCtx = new GameContext(star: star, scale: 0.2);
-  var canvas = new CanvasElement();
+  var gameCtx = new GameContext(star: star, scale: 0.25);
+  var canvas = document.body.querySelector('#game') as CanvasElement;
 
   var width = star.width.floor();
   var height = star.height.floor();
@@ -26,10 +20,20 @@ main() {
   canvas.width = width;
   canvas.height = height;
 
+  canvas.context2D.scale(gameCtx.scale, gameCtx.scale);
+  _drawStar(canvas, gameCtx);
+
+  var newPlanetButton = document.body.querySelector('#add_planet');
+  newPlanetButton.onClick.listen((_) {
+    var planet = new Planet(x: Sector.WIDTH / 2, y: Sector.HEIGHT / 2);
+    star.planets.add(planet);
+    _drawStar(canvas, gameCtx);
+  });
+}
+
+void _drawStar(CanvasElement canvas, GameContext gameCtx) {
   var renderCtx = canvas.context2D;
-  renderCtx.scale(gameCtx.scale, gameCtx.scale);
   renderCtx.setFillColorRgb(0, 0, 0);
   renderCtx.fillRect(0, 0, canvas.width, canvas.height);
-  document.body.append(canvas);
-  star.draw(renderCtx, gameCtx);
+  gameCtx.star.draw(renderCtx, gameCtx);
 }

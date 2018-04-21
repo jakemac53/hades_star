@@ -22,6 +22,8 @@ class Sector extends GameObject {
   @override
   double get width => WIDTH;
 
+  final String name;
+
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
     Position hexCorner(int i) {
@@ -41,7 +43,11 @@ class Sector extends GameObject {
       renderCtx.lineTo(position.x, position.y);
     }
     renderCtx.stroke();
+
+    renderCtx.font = '90px sans-serif';
+    renderCtx.setFillColorRgb(0, 255, 0);
+    renderCtx.fillText(name, x - 45, y + 45);
   }
 
-  Sector({@required this.x, @required this.y});
+  Sector({@required this.x, @required this.y, @required this.name});
 }

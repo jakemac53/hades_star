@@ -37,7 +37,11 @@ class Star extends GameObject {
 
         var x = Sector.SIZE * 3 / 2 * q;
         var y = Sector.SIZE * math.sqrt(3) * (r + q / 2);
-        sectors.add(new Sector(x: x + centerX, y: y + centerY));
+        var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+        var col = q + (numLayers / 2).floor() + 1;
+        var row = col < numLayers ? r + col + 1 : r + numLayers;
+        sectors.add(new Sector(
+            x: x + centerX, y: y + centerY, name: '${letters[col]} $row'));
       }
     }
   }
