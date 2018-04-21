@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:meta/meta.dart';
 
 import 'common.dart';
+import 'jump_gate.dart';
 import 'planet.dart';
 import 'sector.dart';
 
@@ -24,12 +25,15 @@ class Star extends GameObject {
 
   final List<Sector> sectors;
 
+  final List<JumpGate> jumpGates;
+
   Star._(
       {@required this.planets,
       @required this.height,
       @required this.width,
       @required int numLayers})
-      : sectors = <Sector>[] {
+      : sectors = <Sector>[],
+        jumpGates = <JumpGate>[] {
     for (var q = -numLayers + 1; q < numLayers; q++) {
       for (var r = -numLayers + 1; r < numLayers; r++) {
         if (q + r < -(numLayers - 1)) continue;
@@ -37,14 +41,16 @@ class Star extends GameObject {
 
         var x = Sector.SIZE * 3 / 2 * q;
         var y = Sector.SIZE * math.sqrt(3) * (r + q / 2);
-        var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
         var col = q + (numLayers / 2).floor() + 1;
         var row = col < numLayers ? r + col + 1 : r + numLayers;
-        sectors.add(new Sector(
-            x: x + centerX, y: y + centerY, name: '${letters[col]} $row'));
+        var sector = new Sector(
+            x: x + centerX, y: y + centerY, name: '${letters[col]}$row');
+        sectors.add(sector);
       }
     }
   }
+
+  final letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 
   // Create a star with [numLayers] layers of hexes making up the overall hex.
   factory Star(int numLayers) {
@@ -69,6 +75,9 @@ class Star extends GameObject {
     }
     for (var planet in planets) {
       planet.draw(renderCtx, gameCtx);
+    }
+    for (var jumpGate in jumpGates) {
+      jumpGate.draw(renderCtx, gameCtx);
     }
   }
 }

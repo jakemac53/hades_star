@@ -46,7 +46,7 @@ class Sector extends GameObject {
 
     renderCtx.font = '90px sans-serif';
     renderCtx.setFillColorRgb(0, 255, 0);
-    renderCtx.fillText(name, x - 45, y + 45);
+    renderCtx.fillText(name, x - 45, y + 30);
   }
 
   Sector({@required this.x, @required this.y, @required this.name});

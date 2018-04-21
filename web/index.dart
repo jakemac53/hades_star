@@ -2,6 +2,7 @@ import 'dart:html';
 // import 'dart:math' as math;
 
 import 'package:hades_simulator/common.dart';
+import 'package:hades_simulator/jump_gate.dart';
 import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
@@ -27,6 +28,25 @@ main() {
   newPlanetButton.onClick.listen((_) {
     var planet = new Planet(x: Sector.WIDTH / 2, y: Sector.HEIGHT / 2);
     star.planets.add(planet);
+    _drawStar(canvas, gameCtx);
+  });
+
+  var newJumpGateButton =
+      document.body.querySelector('#add_jg') as ButtonElement;
+  var newJumpGateSectorInput =
+      document.body.querySelector('#jg_sector') as InputElement;
+  newJumpGateButton.onClick.listen((_) {
+    var sectorName = newJumpGateSectorInput.value;
+    star.sectors.forEach((sector) => print(sector.name));
+    var sector = star.sectors
+        .firstWhere((s) => s.name == sectorName.toLowerCase(), orElse: () {
+      window.alert('Unable to find a sector by the name "$sectorName');
+      return null;
+    });
+    if (sector == null) return;
+    var jG = new JumpGate(
+        x: sector.x - JumpGate.SIZE / 2, y: sector.y - JumpGate.SIZE / 2);
+    star.jumpGates.add(jG);
     _drawStar(canvas, gameCtx);
   });
 
