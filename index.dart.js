@@ -3307,11 +3307,12 @@ a.fill("nonzero")}}}],["","",,S,{"^":"",ee:{"^":"fp;k:a>,m:b>",
 gn:function(a){return 100},
 gl:function(a){return 100},
 P:function(a,b){a.fillStyle="rgba(255, 0, 0, 1)"
+a.strokeStyle="rgba(255, 0, 0, 1)"
 a.beginPath()
 a.arc(this.a+this.gn(this)/2,this.b+this.gl(this)/2,50,0,6.283185307179586,!1)
 a.fill("nonzero")}},fp:{"^":"av+dD;"}}],["","",,T,{"^":"",cl:{"^":"av;k:a>,m:b>,q:c>",
 gl:function(a){return $.$get$aP()},
-gn:function(a){return 600},
+gn:function(a){return 500},
 P:function(a,b){var z,y,x,w,v
 z=new T.ek(this)
 a.strokeStyle="rgba(255, 255, 255, 1)"
@@ -3328,9 +3329,9 @@ C.m.cV(a,this.c,this.a-45,this.b+30)}},ek:{"^":"c:13;a",
 $1:function(a){var z,y
 z=0.017453292519943295*(60*a)
 y=this.a
-return new R.en(y.a+300*Math.cos(z),y.b+300*Math.sin(z))}}}],["","",,Q,{"^":"",eo:{"^":"av;k:a>,m:b>,l:c>,n:d>,e,f,r,x",
+return new R.en(y.a+250*Math.cos(z),y.b+250*Math.sin(z))}}}],["","",,Q,{"^":"",eo:{"^":"av;k:a>,m:b>,l:c>,n:d>,e,f,r,x",
 c_:function(a,b,c,d){var z,y,x,w,v,u,t,s,r,q,p,o,n,m,l,k,j
-for(z=-b+1,y=this.d/2,x=this.c/2,w=this.x,v=this.f,u=b/2,t=b-1,s=-t,r=z;r<b;++r)for(q=450*r,p=r/2,o=z;o<b;++o){n=r+o
+for(z=-b+1,y=this.d/2,x=this.c/2,w=this.x,v=this.f,u=b/2,t=b-1,s=-t,r=z;r<b;++r)for(q=375*r,p=r/2,o=z;o<b;++o){n=r+o
 if(n<s)continue
 if(n>t)continue
 n=Math.sqrt(3)
@@ -3339,7 +3340,7 @@ l=m<b?o+m+1:o+b
 k=this.a
 j=this.b
 if(m<0||m>=7)return H.e(w,m)
-v.push(new T.cl(q+(k+y),300*n*(o+p)+(j+x),w[m]+l))}},
+v.push(new T.cl(q+(k+y),250*n*(o+p)+(j+x),w[m]+l))}},
 P:function(a,b){var z,y,x,w,v,u
 for(z=this.f,y=z.length,x=0;x<z.length;z.length===y||(0,H.M)(z),++x)z[x].P(a,b)
 for(z=this.e,y=z.length,x=0;x<z.length;z.length===y||(0,H.M)(z),++x)z[x].P(a,b)
@@ -3390,9 +3391,9 @@ return z}}}}],["","",,E,{"^":"",
 iM:[function(){var z,y,x,w,v,u,t,s,r,q,p
 z=$.$get$aP()
 if(typeof z!=="number")return z.di()
-y=C.c.bJ(C.c.a8(3000),2)===0?3000+C.c.a8(300):3000
+y=C.c.bJ(C.c.a8(2500),2)===0?2500+C.c.a8(250):2500
 x=Q.ep(z*7,4,[],y)
-w=new R.dK(x,0.25)
+w=new R.dK(x,0.3)
 z=document
 v=H.bz(z.body.querySelector("#game"),"$isbL")
 u=C.d.a8(x.d)
@@ -3404,7 +3405,7 @@ r=""+t+"px"
 s.height=r
 v.width=u
 v.height=t
-v.getContext("2d").scale(0.25,0.25)
+v.getContext("2d").scale(0.3,0.3)
 E.aU(v,w)
 s=J.dm(z.body.querySelector("#add_planet"))
 W.ai(s.a,s.b,new E.hh(x,v,w),!1)
@@ -3444,7 +3445,7 @@ return!0},
 hh:{"^":"c:2;a,b,c",
 $1:function(a){var z=$.$get$aP()
 if(typeof z!=="number")return z.M()
-this.a.e.push(new S.ee(300,z/2))
+this.a.e.push(new S.ee(250,z/2))
 E.aU(this.b,this.c)}},
 hi:{"^":"c:2;a,b,c,d",
 $1:function(a){var z,y,x,w,v
@@ -3723,7 +3724,7 @@ try{(void 0).$method$($argumentsExpr$)}catch(z){return z.message}}())},"cx","$ge
 z=P.w
 y=new P.E(0,C.b,null,[z])
 y.c4(null,C.b,z)
-return y},"an","$get$an",function(){return[]},"bN","$get$bN",function(){return{}},"aP","$get$aP",function(){return 600*P.ho(3)/2}])
+return y},"an","$get$an",function(){return[]},"bN","$get$bN",function(){return{}},"aP","$get$aP",function(){return 500*P.ho(3)/2}])
 I=I.$finishIsolateConstructor(I)
 $=new I()
 init.metadata=[]
