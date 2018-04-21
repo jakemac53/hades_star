@@ -9,10 +9,10 @@ import 'sector.dart';
 
 class Star extends GameObject {
   @override
-  double get x => 0.0;
+  double x = 0.0;
 
   @override
-  double get y => 0.0;
+  double y = 0.0;
 
   @override
   final double height;

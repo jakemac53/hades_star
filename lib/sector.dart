@@ -29,8 +29,8 @@ class Sector extends GameObject {
     Position hexCorner(int i) {
       var deg = 60 * i;
       var rad = math.pi / 180 * deg;
-      var position = new SimplePosition(
-          x: x + SIZE * math.cos(rad), y: y + SIZE * math.sin(rad));
+      var position =
+          new Point(x + SIZE * math.cos(rad), y + SIZE * math.sin(rad));
       return new SimplePosition(x: position.x, y: position.y);
     }
 

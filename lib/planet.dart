@@ -5,13 +5,13 @@ import 'package:meta/meta.dart';
 
 import 'common.dart';
 
-class Planet extends GameObject {
+class Planet extends GameObject with Draggable {
   static const SIZE = 100.0;
 
   @override
-  final double x;
+  double x;
   @override
-  final double y;
+  double y;
   @override
   double get width => SIZE;
   @override
@@ -23,9 +23,6 @@ class Planet extends GameObject {
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
     renderCtx.setFillColorRgb(255, 0, 0);
     renderCtx.beginPath();
-    print(centerX);
-    print(centerY);
-    print(width / 2);
     renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
     renderCtx.fill();
   }

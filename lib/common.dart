@@ -1,8 +1,33 @@
+import 'dart:async';
 import 'dart:html';
 
 import 'package:meta/meta.dart';
 
 import 'star.dart';
+
+abstract class Draggable implements Position {
+  Stream<Null> startDrag(MouseEvent e, CanvasElement el, GameContext gameCtx) {
+    var controller = new StreamController<Null>();
+    var startObjectPos = new Point(x, y);
+    var startMousePos = e.client;
+    var subscriptions = <StreamSubscription>[];
+    subscriptions.add(el.onMouseMove.listen((MouseEvent moveEvent) {
+      var newPos = moveEvent.client;
+      var offset =
+          new Point(newPos.x - startMousePos.x, newPos.y - startMousePos.y);
+      x = startObjectPos.x + offset.x / gameCtx.scale;
+      y = startObjectPos.y + offset.y / gameCtx.scale;
+      controller.add(null);
+    }));
+    subscriptions.add(el.onMouseUp.listen((_) {
+      for (var subscription in subscriptions) {
+        subscription.cancel();
+      }
+      controller.close();
+    }));
+    return controller.stream;
+  }
+}
 
 abstract class Drawable {
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx);
@@ -16,8 +41,8 @@ class GameContext {
 }
 
 abstract class Position {
-  double get x;
-  double get y;
+  double x;
+  double y;
 }
 
 abstract class Size {
@@ -32,9 +57,9 @@ abstract class GameObject implements Position, Size, Drawable {
 
 class SimplePosition implements Position {
   @override
-  final double x;
+  double x;
   @override
-  final double y;
+  double y;
 
   SimplePosition({@required this.x, @required this.y});
 }

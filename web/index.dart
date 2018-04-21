@@ -29,6 +29,19 @@ main() {
     star.planets.add(planet);
     _drawStar(canvas, gameCtx);
   });
+
+  canvas.onMouseDown.listen((e) {
+    var x = e.client.x;
+    var y = e.client.y;
+    for (var planet in star.planets) {
+      if (_rectCollide(x, y, planet, gameCtx.scale)) {
+        planet.startDrag(e, canvas, gameCtx).listen((_) {
+          _drawStar(canvas, gameCtx);
+        });
+        break;
+      }
+    }
+  });
 }
 
 void _drawStar(CanvasElement canvas, GameContext gameCtx) {
@@ -36,4 +49,14 @@ void _drawStar(CanvasElement canvas, GameContext gameCtx) {
   renderCtx.setFillColorRgb(0, 0, 0);
   renderCtx.fillRect(0, 0, canvas.width, canvas.height);
   gameCtx.star.draw(renderCtx, gameCtx);
+}
+
+bool _rectCollide(num x, num y, GameObject object, num scale) {
+  x = x / scale;
+  y = y / scale;
+  var width = object.width / scale;
+  var height = object.height / scale;
+  if (x < object.x || x > object.x + width) return false;
+  if (y < object.y || y > object.y + height) return false;
+  return true;
 }
