@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 
 import 'common.dart';
 
-class Planet extends GameObject with Draggable {
+class Planet extends GameObject with Draggable, DockingPoint {
   static const SIZE = 100.0;
 
   @override

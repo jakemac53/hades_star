@@ -5,6 +5,13 @@ import 'package:meta/meta.dart';
 
 import 'star.dart';
 
+abstract class DockingPoint implements GameObject {
+  int get dockingPointOffset => 10;
+
+  Position get dockingPoint =>
+      new SimplePosition(x: centerX, y: y + height + dockingPointOffset);
+}
+
 abstract class Draggable implements Position {
   Stream<Null> startDrag(MouseEvent e, CanvasElement el, GameContext gameCtx) {
     var controller = new StreamController<Null>();

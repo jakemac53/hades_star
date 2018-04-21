@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 
 import 'common.dart';
 
-class JumpGate extends GameObject {
+class JumpGate extends GameObject with DockingPoint {
   static final SIZE = 50.0;
 
   @override
