@@ -79,5 +79,39 @@ class Star extends GameObject {
     for (var jumpGate in jumpGates) {
       jumpGate.draw(renderCtx, gameCtx);
     }
+    renderCtx.setStrokeColorRgb(0, 255, 0);
+    renderCtx.font = '40px sans-serif';
+    renderCtx.setFillColorRgb(255, 255, 255);
+    var objects = new List<GameObject>.from(planets)..addAll(jumpGates);
+    for (var planet in planets) {
+      objects.remove(planet);
+      _drawDistances(planet, objects, renderCtx);
+    }
+  }
+
+  void _drawDistances(Planet planet, List<GameObject> objects,
+      CanvasRenderingContext2D renderCtx) {
+    for (var object in objects) {
+      _drawDistance(planet, object, renderCtx);
+    }
+  }
+
+  void _drawDistance(
+      GameObject from, GameObject to, CanvasRenderingContext2D renderCtx) {
+    var oldWidth = renderCtx.lineWidth;
+    renderCtx.lineWidth = 4;
+    renderCtx.setLineDash([8, 16]);
+    renderCtx.moveTo(from.centerX, from.centerY);
+    renderCtx.lineTo(to.centerX, to.centerY);
+    renderCtx.stroke();
+    renderCtx.setLineDash([]);
+    renderCtx.lineWidth = oldWidth;
+
+    var xDiff = from.x - to.x;
+    var yDiff = from.y - to.y;
+    var distance =
+        math.sqrt(math.pow(xDiff.abs(), 2) + math.pow(yDiff.abs(), 2)).round();
+    renderCtx.fillText(
+        '${distance}au', from.centerX - xDiff / 2, from.centerY - yDiff / 2);
   }
 }

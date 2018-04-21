@@ -45,7 +45,7 @@ class Sector extends GameObject {
     renderCtx.stroke();
 
     renderCtx.font = '90px sans-serif';
-    renderCtx.setFillColorRgb(0, 255, 0);
+    renderCtx.setFillColorRgb(259, 69, 0);
     renderCtx.fillText(name, x - 45, y + 30);
   }
 
