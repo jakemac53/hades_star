@@ -37,7 +37,6 @@ main() {
       document.body.querySelector('#jg_sector') as InputElement;
   newJumpGateButton.onClick.listen((_) {
     var sectorName = newJumpGateSectorInput.value;
-    star.sectors.forEach((sector) => print(sector.name));
     var sector = star.sectors
         .firstWhere((s) => s.name == sectorName.toLowerCase(), orElse: () {
       window.alert('Unable to find a sector by the name "$sectorName');
