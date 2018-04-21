@@ -1,0 +1,4 @@
+name: hades_simulator
+dev_dependencies:
+  build_runner: any
+  build_web_compilers: any
