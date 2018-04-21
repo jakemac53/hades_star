@@ -8,7 +8,7 @@ import 'common.dart';
 class Sector extends GameObject {
   static final HEIGHT = WIDTH * math.sqrt(3) / 2;
   static const WIDTH = SIZE * 2;
-  static const SIZE = 300.0;
+  static const SIZE = 250.0;
 
   @override
   double x;

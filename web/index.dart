@@ -10,7 +10,7 @@ import 'package:hades_simulator/star.dart';
 main() {
   var star = new Star(4);
 
-  var gameCtx = new GameContext(star: star, scale: 0.25);
+  var gameCtx = new GameContext(star: star, scale: 0.3);
   var canvas = document.body.querySelector('#game') as CanvasElement;
 
   var width = star.width.floor();

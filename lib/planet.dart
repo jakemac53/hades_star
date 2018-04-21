@@ -22,6 +22,7 @@ class Planet extends GameObject with Draggable {
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
     renderCtx.setFillColorRgb(255, 0, 0);
+    renderCtx.setStrokeColorRgb(255, 0, 0);
     renderCtx.beginPath();
     renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
     renderCtx.fill();
