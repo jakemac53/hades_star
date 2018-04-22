@@ -34,14 +34,13 @@ main() async {
 
     var star = new Star.withLayers(4, starRef.key, name);
     await starRef.set(json.encode(star.toJson()));
-    window.open('star.html?${starRef.key}', starRef.key);
   });
 
   var starList = document.body.querySelector('#existing_stars') as UListElement;
-  var stars = await database.ref('stars').once('value');
-  stars.snapshot.forEach((child) {
+  database.ref('stars').onChildAdded.listen((event) {
     var star = new Star.fromJson(
-        (json.decode(child.toJson() as String) as Map).cast<String, dynamic>());
+        (json.decode(event.snapshot.toJson() as String) as Map)
+            .cast<String, dynamic>());
     var href = 'star.html?${star.firebaseId}';
     starList.append(new LIElement()
       ..append(new AnchorElement()
