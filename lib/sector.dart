@@ -1,11 +1,15 @@
 import 'dart:html';
 import 'dart:math' as math;
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 import 'common.dart';
 
-class Sector extends GameObject {
+part 'sector.g.dart';
+
+@JsonSerializable()
+class Sector extends GameObject with _$SectorSerializerMixin {
   static final HEIGHT = WIDTH * math.sqrt(3) / 2;
   static const WIDTH = SIZE * 2;
   static const SIZE = 250.0;
@@ -22,7 +26,10 @@ class Sector extends GameObject {
   @override
   double get width => WIDTH;
 
+  @override
   final String name;
+
+  factory Sector.fromJson(Map<String, dynamic> json) => _$SectorFromJson(json);
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {

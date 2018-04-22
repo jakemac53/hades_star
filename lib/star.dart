@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:math' as math;
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 import 'common.dart';
@@ -8,7 +9,10 @@ import 'jump_gate.dart';
 import 'planet.dart';
 import 'sector.dart';
 
-class Star extends GameObject {
+part 'star.g.dart';
+
+@JsonSerializable()
+class Star extends GameObject with _$StarSerializerMixin {
   @override
   double x = 0.0;
 
@@ -21,10 +25,13 @@ class Star extends GameObject {
   @override
   final double width;
 
+  @override
   final List<Planet> planets;
 
+  @override
   final List<Sector> sectors;
 
+  @override
   final List<JumpGate> jumpGates;
 
   Star._(
@@ -34,6 +41,7 @@ class Star extends GameObject {
       @required int numLayers})
       : sectors = <Sector>[],
         jumpGates = <JumpGate>[] {
+    const letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
     for (var q = -numLayers + 1; q < numLayers; q++) {
       for (var r = -numLayers + 1; r < numLayers; r++) {
         if (q + r < -(numLayers - 1)) continue;
@@ -50,10 +58,15 @@ class Star extends GameObject {
     }
   }
 
-  final letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+  Star(
+      {@required this.planets,
+      @required this.height,
+      @required this.width,
+      @required this.sectors,
+      @required this.jumpGates});
 
   // Create a star with [numLayers] layers of hexes making up the overall hex.
-  factory Star(int numLayers) {
+  factory Star.withLayers(int numLayers) {
     var totalHeight = (Sector.HEIGHT * ((numLayers - 1) * 2 + 1));
     var totalWidth = (Sector.WIDTH * ((((numLayers - 1) ~/ 2) * 2) + 1) +
         Sector.WIDTH * 0.5 * (numLayers ~/ 2) * 2);
@@ -67,6 +80,8 @@ class Star extends GameObject {
         height: totalHeight,
         width: totalWidth);
   }
+
+  factory Star.fromJson(Map<String, dynamic> json) => _$StarFromJson(json);
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {

@@ -1,11 +1,15 @@
 import 'dart:html';
 import 'dart:math' as math;
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 import 'common.dart';
 
-class JumpGate extends GameObject with DockingPoint {
+part 'jump_gate.g.dart';
+
+@JsonSerializable()
+class JumpGate extends GameObject with DockingPoint, _$JumpGateSerializerMixin {
   static final SIZE = 50.0;
 
   @override
@@ -21,6 +25,9 @@ class JumpGate extends GameObject with DockingPoint {
   double get width => SIZE;
 
   JumpGate({@required this.x, @required this.y});
+
+  factory JumpGate.fromJson(Map<String, dynamic> json) =>
+      _$JumpGateFromJson(json);
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {

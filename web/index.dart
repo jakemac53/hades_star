@@ -1,5 +1,5 @@
+// import 'dart:async';
 import 'dart:html';
-// import 'dart:math' as math;
 
 import 'package:hades_simulator/common.dart';
 import 'package:hades_simulator/jump_gate.dart';
@@ -7,8 +7,8 @@ import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
-main() {
-  var star = new Star(4);
+main() async {
+  var star = new Star.withLayers(4);
 
   var gameCtx = new GameContext(star: star, scale: 0.3);
   var canvas = document.body.querySelector('#game') as CanvasElement;
@@ -22,13 +22,13 @@ main() {
   canvas.height = height;
 
   canvas.context2D.scale(gameCtx.scale, gameCtx.scale);
-  _drawStar(canvas, gameCtx);
+  _updateStar(star, canvas, gameCtx);
 
   var newPlanetButton = document.body.querySelector('#add_planet');
   newPlanetButton.onClick.listen((_) {
     var planet = new Planet(x: Sector.WIDTH / 2, y: Sector.HEIGHT / 2);
     star.planets.add(planet);
-    _drawStar(canvas, gameCtx);
+    _updateStar(star, canvas, gameCtx);
   });
 
   var newJumpGateButton =
@@ -46,7 +46,7 @@ main() {
     var jG = new JumpGate(
         x: sector.x - JumpGate.SIZE / 2, y: sector.y - JumpGate.SIZE / 2);
     star.jumpGates.add(jG);
-    _drawStar(canvas, gameCtx);
+    _updateStar(star, canvas, gameCtx);
   });
 
   canvas.onMouseDown.listen((e) {
@@ -55,7 +55,7 @@ main() {
     for (var planet in star.planets) {
       if (_rectCollide(x, y, planet, gameCtx.scale)) {
         planet.startDrag(e, canvas, gameCtx).listen((_) {
-          _drawStar(canvas, gameCtx);
+          _updateStar(star, canvas, gameCtx);
         });
         break;
       }
@@ -63,7 +63,7 @@ main() {
   });
 }
 
-void _drawStar(CanvasElement canvas, GameContext gameCtx) {
+void _updateStar(Star star, CanvasElement canvas, GameContext gameCtx) {
   var renderCtx = canvas.context2D;
   renderCtx.setFillColorRgb(0, 0, 0);
   renderCtx.fillRect(0, 0, canvas.width, canvas.height);
