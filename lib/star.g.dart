@@ -20,11 +20,15 @@ Star _$StarFromJson(Map<String, dynamic> json) => new Star(
     jumpGates: (json['jumpGates'] as List)
         ?.map((e) =>
             e == null ? null : new JumpGate.fromJson(e as Map<String, dynamic>))
-        ?.toList())
+        ?.toList(),
+    firebaseId: json['firebaseId'] as String,
+    name: json['name'] as String)
   ..x = (json['x'] as num)?.toDouble()
   ..y = (json['y'] as num)?.toDouble();
 
 abstract class _$StarSerializerMixin {
+  String get firebaseId;
+  String get name;
   double get x;
   double get y;
   double get height;
@@ -33,6 +37,8 @@ abstract class _$StarSerializerMixin {
   List<Sector> get sectors;
   List<JumpGate> get jumpGates;
   Map<String, dynamic> toJson() => <String, dynamic>{
+        'firebaseId': firebaseId,
+        'name': name,
         'x': x,
         'y': y,
         'height': height,

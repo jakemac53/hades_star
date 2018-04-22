@@ -1,19 +1,23 @@
 <html>
 
 <head>
+    <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
     <script defer src="index.dart.js"></script>
-    <style>
-    </style>
 </head>
 
 <body style="width: 100%">
-    <button id="add_planet" style="float: left;">Create Planet</button>
-    <button id="add_jg" style="float: left; margin-left: 40px">Create JG</button>
-    <span style="float: left; display: block;">
-        <label for="jg_sector" style="float: left;display: block;margin-left: 5px;">sector:</label>
-        <input id="jg_sector" style="float: left; margin-left: 5px">
-    </span>
-    <canvas id="game" style="display: block; float: left;"></canvas>
+    <!-- <select id="star_select">
+        <option value="None">No star selected</option>
+    </select> -->
+    <h2>Create a new star</h2>
+    <p>
+        <label for="star_name">Name:</label>
+        <input id="star_name" />
+        <br />
+        <button id="create_star">Create Star</button>
+    </p>
+    <h2>Existing Stars</h2>
+    <ul id="existing_stars"></ul>
 </body>
 
 </html>

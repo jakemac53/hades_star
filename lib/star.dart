@@ -14,6 +14,12 @@ part 'star.g.dart';
 @JsonSerializable()
 class Star extends GameObject with _$StarSerializerMixin {
   @override
+  final String firebaseId;
+
+  @override
+  final String name;
+
+  @override
   double x = 0.0;
 
   @override
@@ -38,7 +44,9 @@ class Star extends GameObject with _$StarSerializerMixin {
       {@required this.planets,
       @required this.height,
       @required this.width,
-      @required int numLayers})
+      @required int numLayers,
+      @required this.firebaseId,
+      @required this.name})
       : sectors = <Sector>[],
         jumpGates = <JumpGate>[] {
     const letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
@@ -63,10 +71,12 @@ class Star extends GameObject with _$StarSerializerMixin {
       @required this.height,
       @required this.width,
       @required this.sectors,
-      @required this.jumpGates});
+      @required this.jumpGates,
+      @required this.firebaseId,
+      @required this.name});
 
   // Create a star with [numLayers] layers of hexes making up the overall hex.
-  factory Star.withLayers(int numLayers) {
+  factory Star.withLayers(int numLayers, String firebaseId, String name) {
     var totalHeight = (Sector.HEIGHT * ((numLayers - 1) * 2 + 1));
     var totalWidth = (Sector.WIDTH * ((((numLayers - 1) ~/ 2) * 2) + 1) +
         Sector.WIDTH * 0.5 * (numLayers ~/ 2) * 2);
@@ -78,7 +88,9 @@ class Star extends GameObject with _$StarSerializerMixin {
         planets: [],
         numLayers: numLayers,
         height: totalHeight,
-        width: totalWidth);
+        width: totalWidth,
+        firebaseId: firebaseId,
+        name: name);
   }
 
   factory Star.fromJson(Map<String, dynamic> json) => _$StarFromJson(json);

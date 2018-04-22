@@ -1,5 +1,6 @@
 name: hades_simulator
 dependencies:
+  firebase: any
   json_annotation: any
   meta: any
 dev_dependencies:
