@@ -7,4 +7,3 @@ dev_dependencies:
   build_runner: any
   build_web_compilers: any
   json_serializable: any
-  peanut: any

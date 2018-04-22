@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:html';
-import 'dart:indexed_db';
 
 import 'package:meta/meta.dart';
 

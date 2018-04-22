@@ -4,10 +4,6 @@ import 'dart:html';
 
 import 'package:firebase/firebase.dart' as firebase;
 
-import 'package:hades_simulator/common.dart';
-import 'package:hades_simulator/jump_gate.dart';
-import 'package:hades_simulator/sector.dart';
-import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
 main() async {
