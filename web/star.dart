@@ -70,13 +70,13 @@ main() async {
   canvas.height = height;
 
   canvas.context2D.scale(gameCtx.scale, gameCtx.scale);
-  _updateStar(star, canvas, gameCtx);
+  _drawStar(star, canvas, gameCtx);
 
   var newPlanetButton = document.body.querySelector('#add_planet');
   newPlanetButton.onClick.listen((_) {
     var planet = new Planet(x: Sector.WIDTH / 2, y: Sector.HEIGHT / 2);
-    star.planets.add(planet);
-    _updateStar(star, canvas, gameCtx);
+    var ref = planetsRef.child(star.planets.length.toString());
+    ref.set(planet.toJson());
   });
 
   var newJumpGateButton =
@@ -91,15 +91,11 @@ main() async {
       return null;
     });
     if (sector == null) return;
+
     var jG = new JumpGate(
         x: sector.x - JumpGate.SIZE / 2, y: sector.y - JumpGate.SIZE / 2);
-    star.jumpGates.add(jG);
-    _updateStar(star, canvas, gameCtx);
-  });
-
-  var saveButton = document.body.querySelector('#save') as ButtonElement;
-  saveButton.onClick.listen((_) {
-    _updateDb(star, database);
+    var ref = jumpGatesRef.child(star.jumpGates.length.toString());
+    ref.set(jG.toJson());
   });
 
   canvas.onMouseDown.listen((e) {
@@ -108,15 +104,39 @@ main() async {
     for (var planet in star.planets) {
       if (_rectCollide(x, y, planet, gameCtx.scale)) {
         planet.startDrag(e, canvas, gameCtx).listen((_) {
-          _updateStar(star, canvas, gameCtx);
+          _drawStar(star, canvas, gameCtx);
+        }).onDone(() {
+          _updatePlanet(star, planet, database);
         });
         break;
       }
     }
   });
+
+  void _onPlanetUpdate(firebase.QueryEvent event) {
+    var position = int.parse(event.snapshot.key);
+    if (position >= star.planets.length) star.planets.length = position + 1;
+    star.planets[position] = new Planet.fromJson(
+        (event.snapshot.toJson() as Map).cast<String, dynamic>());
+    _drawStar(star, canvas, gameCtx);
+  }
+
+  planetsRef.onChildChanged.listen(_onPlanetUpdate);
+  planetsRef.onChildAdded.listen(_onPlanetUpdate);
+
+  void _updateJumpGate(firebase.QueryEvent event) {
+    var position = int.parse(event.snapshot.key);
+    if (position >= star.jumpGates.length) star.jumpGates.length = position + 1;
+    star.jumpGates[position] = new JumpGate.fromJson(
+        (event.snapshot.toJson() as Map).cast<String, dynamic>());
+    _drawStar(star, canvas, gameCtx);
+  }
+
+  jumpGatesRef.onChildChanged.listen(_updateJumpGate);
+  jumpGatesRef.onChildAdded.listen(_updateJumpGate);
 }
 
-void _updateStar(Star star, CanvasElement canvas, GameContext gameCtx) {
+void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {
   var renderCtx = canvas.context2D;
   renderCtx.setFillColorRgb(0, 0, 0);
   renderCtx.fillRect(0, 0, canvas.width, canvas.height);
@@ -134,35 +154,29 @@ bool _rectCollide(num x, num y, GameObject object, num scale) {
 }
 
 bool _updating = false;
-Star _nextUpdate;
+Star _nextUpdateStar;
+Planet _nextUpdatePlanet;
 
-Future _updateDb(Star star, firebase.Database db) async {
+Future _updatePlanet(Star star, Planet planet, firebase.Database db) async {
   var savingSpan = document.body.querySelector('#saving');
   if (_updating) {
-    _nextUpdate = star;
+    _nextUpdateStar = star;
+    _nextUpdatePlanet = planet;
     return;
   }
   savingSpan.text = 'saving...';
   _updating = true;
 
-  var starRef = db.ref('/stars/${star.firebaseId}');
-  await starRef.set(star.toJson());
-
-  var sectorsRef = db.ref('/sectors/${star.firebaseId}');
-  await sectorsRef.set(star.sectors.map((sector) => sector.toJson()).toList());
-
-  var planetsRef = db.ref('/planets/${star.firebaseId}');
-  await planetsRef.set(star.planets.map((planet) => planet.toJson()).toList());
-
-  var jumpGatesRef = db.ref('/jump_gates/${star.firebaseId}');
-  await jumpGatesRef
-      .set(star.jumpGates.map((jumpGate) => jumpGate.toJson()).toList());
+  var planetRef =
+      db.ref('/planets/${star.firebaseId}/${star.planets.indexOf(planet)}');
+  await planetRef.set(planet.toJson());
 
   savingSpan.text = 'done!';
   _updating = false;
-  if (_nextUpdate != null) {
-    _nextUpdate = null;
+  if (_nextUpdateStar != null) {
+    _nextUpdateStar = null;
+    _nextUpdatePlanet = null;
     // ignore: unawaited_futures
-    _updateDb(_nextUpdate, db);
+    _updatePlanet(_nextUpdateStar, _nextUpdatePlanet, db);
   }
 }
