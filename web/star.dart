@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:html';
 
 import 'package:firebase/firebase.dart' as firebase;
@@ -27,11 +26,34 @@ main() async {
       storageBucket: 'hades-star-a1bff.appspot.com',
       messagingSenderId: '927697248914');
   var database = firebase.database();
-  var starJson = json.decode(
-      (await database.ref('stars').child(starId).once('value'))
-          .snapshot
-          .toJson() as String) as Map;
+  var starJson = (await database.ref('stars').child(starId).once('value'))
+      .snapshot
+      .toJson() as Map;
   var star = new Star.fromJson(starJson.cast<String, dynamic>());
+
+  var sectorsRef = database.ref('/sectors/$starId');
+  var sectorsJson = (await sectorsRef.once('value')).snapshot.toJson() as Map;
+  assert(sectorsJson != null);
+  var sectors = sectorsJson.values.map((sectorJson) =>
+      new Sector.fromJson((sectorJson as Map).cast<String, dynamic>()));
+  star.sectors.addAll(sectors);
+
+  var planetsRef = database.ref('/planets/$starId');
+  var planetsJson = (await planetsRef.once('value')).snapshot.toJson() as Map;
+  if (planetsJson != null) {
+    var planets = planetsJson.values.map((planetJson) =>
+        new Planet.fromJson((planetJson as Map).cast<String, dynamic>()));
+    star.planets.addAll(planets);
+  }
+
+  var jumpGatesRef = database.ref('/jump_gates/$starId');
+  var jumpGatesJson =
+      (await jumpGatesRef.once('value')).snapshot.toJson() as Map;
+  if (jumpGatesJson != null) {
+    var jumpGates = jumpGatesJson.values.map((jumpGateJson) =>
+        new JumpGate.fromJson((jumpGateJson as Map).cast<String, dynamic>()));
+    star.jumpGates.addAll(jumpGates);
+  }
 
   var gameCtx = new GameContext(
     star: star,
@@ -122,7 +144,20 @@ Future _updateDb(Star star, firebase.Database db) async {
   }
   savingSpan.text = 'saving...';
   _updating = true;
-  await db.ref('stars').child(star.firebaseId).set(json.encode(star.toJson()));
+
+  var starRef = db.ref('/stars/${star.firebaseId}');
+  await starRef.set(star.toJson());
+
+  var sectorsRef = db.ref('/sectors/${star.firebaseId}');
+  await sectorsRef.set(star.sectors.map((sector) => sector.toJson()).toList());
+
+  var planetsRef = db.ref('/planets/${star.firebaseId}');
+  await planetsRef.set(star.planets.map((planet) => planet.toJson()).toList());
+
+  var jumpGatesRef = db.ref('/jump_gates/${star.firebaseId}');
+  await jumpGatesRef
+      .set(star.jumpGates.map((jumpGate) => jumpGate.toJson()).toList());
+
   savingSpan.text = 'done!';
   _updating = false;
   if (_nextUpdate != null) {

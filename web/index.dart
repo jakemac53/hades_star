@@ -26,16 +26,18 @@ main() async {
       return;
     }
     var starRef = database.ref('stars').push();
-
     var star = new Star.withLayers(4, starRef.key, name);
-    await starRef.set(json.encode(star.toJson()));
+    await starRef.set(star.toJson());
+
+    var sectorsRef = database.ref('/sectors/${starRef.key}');
+    await sectorsRef
+        .set(star.sectors.map((sector) => sector.toJson()).toList());
   });
 
   var starList = document.body.querySelector('#existing_stars') as UListElement;
   database.ref('stars').onChildAdded.listen((event) {
     var star = new Star.fromJson(
-        (json.decode(event.snapshot.toJson() as String) as Map)
-            .cast<String, dynamic>());
+        (event.snapshot.toJson() as Map).cast<String, dynamic>());
     var href = 'star.html?${star.firebaseId}';
     starList.append(new LIElement()
       ..append(new AnchorElement()

@@ -30,6 +30,7 @@ class Sector extends GameObject with _$SectorSerializerMixin {
   final String name;
 
   factory Sector.fromJson(Map<String, dynamic> json) => _$SectorFromJson(json);
+  Sector({@required this.x, @required this.y, @required this.name});
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
@@ -55,6 +56,4 @@ class Sector extends GameObject with _$SectorSerializerMixin {
     renderCtx.setFillColorRgb(259, 69, 0);
     renderCtx.fillText(name, x - 45, y + 30);
   }
-
-  Sector({@required this.x, @required this.y, @required this.name});
 }

@@ -12,10 +12,7 @@ import 'sector.dart';
 part 'star.g.dart';
 
 @JsonSerializable()
-class Star extends GameObject with _$StarSerializerMixin {
-  @override
-  final String firebaseId;
-
+class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   @override
   final String name;
 
@@ -31,24 +28,25 @@ class Star extends GameObject with _$StarSerializerMixin {
   @override
   final double width;
 
-  @override
+  @JsonKey(ignore: true)
   final List<Planet> planets;
 
-  @override
+  @JsonKey(ignore: true)
   final List<Sector> sectors;
 
-  @override
+  @JsonKey(ignore: true)
   final List<JumpGate> jumpGates;
 
   Star._(
-      {@required this.planets,
-      @required this.height,
+      {@required this.height,
       @required this.width,
       @required int numLayers,
-      @required this.firebaseId,
+      @required String firebaseId,
       @required this.name})
-      : sectors = <Sector>[],
-        jumpGates = <JumpGate>[] {
+      : jumpGates = <JumpGate>[],
+        planets = <Planet>[],
+        sectors = <Sector>[],
+        super(firebaseId) {
     const letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
     for (var q = -numLayers + 1; q < numLayers; q++) {
       for (var r = -numLayers + 1; r < numLayers; r++) {
@@ -67,13 +65,17 @@ class Star extends GameObject with _$StarSerializerMixin {
   }
 
   Star(
-      {@required this.planets,
+      {List<JumpGate> jumpGates,
+      List<Planet> planets,
+      List<Sector> sectors,
       @required this.height,
       @required this.width,
-      @required this.sectors,
-      @required this.jumpGates,
-      @required this.firebaseId,
-      @required this.name});
+      @required String firebaseId,
+      @required this.name})
+      : planets = planets ?? <Planet>[],
+        sectors = sectors ?? <Sector>[],
+        jumpGates = jumpGates ?? <JumpGate>[],
+        super(firebaseId);
 
   // Create a star with [numLayers] layers of hexes making up the overall hex.
   factory Star.withLayers(int numLayers, String firebaseId, String name) {
@@ -85,7 +87,6 @@ class Star extends GameObject with _$StarSerializerMixin {
     }
 
     return new Star._(
-        planets: [],
         numLayers: numLayers,
         height: totalHeight,
         width: totalWidth,

@@ -57,6 +57,11 @@ abstract class Size {
   double get height;
 }
 
+class FirebaseObject {
+  final String firebaseId;
+  FirebaseObject(this.firebaseId);
+}
+
 abstract class GameObject implements Position, Size, Drawable {
   double get centerX => x + width / 2;
   double get centerY => y + height / 2;
