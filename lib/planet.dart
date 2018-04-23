@@ -11,7 +11,7 @@ part 'planet.g.dart';
 @JsonSerializable()
 class Planet extends GameObject
     with Draggable, DockingPoint, _$PlanetSerializerMixin {
-  static const SIZE = 100.0;
+  static const SIZE = 60.0;
 
   @override
   double x;

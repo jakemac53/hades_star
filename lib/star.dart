@@ -128,7 +128,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       DockingPoint from, DockingPoint to, CanvasRenderingContext2D renderCtx) {
     var oldWidth = renderCtx.lineWidth;
     renderCtx.lineWidth = 4;
-    renderCtx.setLineDash([8, 16]);
+    renderCtx.setLineDash([8, 24]);
     renderCtx.moveTo(from.dockingPoint.x, from.dockingPoint.y);
     renderCtx.lineTo(to.dockingPoint.x, to.dockingPoint.y);
     renderCtx.stroke();
@@ -141,5 +141,6 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
         math.sqrt(math.pow(xDiff.abs(), 2) + math.pow(yDiff.abs(), 2)).round();
     renderCtx.fillText('${distance}au', from.dockingPoint.x - xDiff / 2,
         from.dockingPoint.y - yDiff / 2);
+    renderCtx.lineWidth = oldWidth;
   }
 }

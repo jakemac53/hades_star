@@ -39,6 +39,9 @@ main() async {
   star.sectors.addAll(sectors);
 
   var planetsRef = database.ref('/planets/$starId');
+  if (planetsRef == null) {
+    await database.ref('planets').push(starId).set({});
+  }
   var planetsJson = (await planetsRef.once('value')).snapshot.toJson() as Map;
   if (planetsJson != null) {
     var planets = planetsJson.values.map((planetJson) =>
@@ -47,6 +50,9 @@ main() async {
   }
 
   var jumpGatesRef = database.ref('/jump_gates/$starId');
+  if (jumpGatesRef == null) {
+    await database.ref('jump_gates').push(starId).set({});
+  }
   var jumpGatesJson =
       (await jumpGatesRef.once('value')).snapshot.toJson() as Map;
   if (jumpGatesJson != null) {
