@@ -26,16 +26,16 @@ main() async {
     }
     var starRef = database.ref('stars').push();
     var star = new Star.withLayers(4, starRef.key, name);
-    await starRef.set(star.toJson());
 
+    // Push the sectors before the star, we need to push them individually which takes a minute.
     var sectorsRef = database.ref('sectors').child(star.firebaseId);
     await sectorsRef.set({});
     for (var i = 0; i < star.sectors.length; i++) {
       var sectorRef = sectorsRef.child('$i');
       await sectorRef.set(star.sectors[i].toJson());
     }
-    await sectorsRef
-        .set(star.sectors.map((sector) => sector.toJson()).toList());
+
+    await starRef.set(star.toJson());
   });
 
   var starList = document.body.querySelector('#existing_stars') as UListElement;
