@@ -28,12 +28,12 @@ main() async {
     var star = new Star.withLayers(4, starRef.key, name);
     await starRef.set(star.toJson());
 
-    var sectorsRef = database.ref('/sectors/${star.firebaseId}');
-    print(sectorsRef.key);
-    print(sectorsRef.parent.key);
-    await sectorsRef.set({'a': 'b'});
-    print((await sectorsRef.once('value')).snapshot.toJson());
-    print(star.sectors.map((sector) => sector.toJson()).toList());
+    var sectorsRef = database.ref('sectors').child(star.firebaseId);
+    await sectorsRef.set({});
+    for (var i = 0; i < star.sectors.length; i++) {
+      var sectorRef = sectorsRef.child('$i');
+      await sectorRef.set(star.sectors[i].toJson());
+    }
     await sectorsRef
         .set(star.sectors.map((sector) => sector.toJson()).toList());
   });
