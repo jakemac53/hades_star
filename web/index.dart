@@ -29,8 +29,10 @@ main() async {
     await starRef.set(star.toJson());
 
     var sectorsRef = database.ref('/sectors/${star.firebaseId}');
-    await sectorsRef.set({});
-    await sectorsRef.once('value');
+    print(sectorsRef.key);
+    print(sectorsRef.parent.key);
+    await sectorsRef.set({'a': 'b'});
+    print((await sectorsRef.once('value')).snapshot.toJson());
     await sectorsRef
         .set(star.sectors.map((sector) => sector.toJson()).toList());
   });
