@@ -33,6 +33,7 @@ main() async {
     print(sectorsRef.parent.key);
     await sectorsRef.set({'a': 'b'});
     print((await sectorsRef.once('value')).snapshot.toJson());
+    print(star.sectors.map((sector) => sector.toJson()).toList());
     await sectorsRef
         .set(star.sectors.map((sector) => sector.toJson()).toList());
   });
