@@ -30,6 +30,7 @@ main() async {
 
     var sectorsRef = database.ref('/sectors/${star.firebaseId}');
     await sectorsRef.set({});
+    await sectorsRef.once('value');
     await sectorsRef
         .set(star.sectors.map((sector) => sector.toJson()).toList());
   });
