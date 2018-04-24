@@ -5089,96 +5089,111 @@ c.fillText(v,u-t/2,r-s/2)
 c.lineWidth=w}},
 $isaY:1},iX:{"^":"b;",
 G:function(){return P.bP(["firebaseId",this.gcB(),"name",this.b,"x",this.c,"y",this.d,"height",this.e,"width",this.f],P.u,null)}},kq:{"^":"hn+bN;"},kr:{"^":"kq+iX;"}}],["","",,Q,{"^":"",
-aj:[function(){var z=0,y=P.dq(),x,w,v,u,t,s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6
-var $async$aj=P.f3(function(a7,a8){if(a7===1)return P.eT(a8,y)
-while(true)switch(z){case 0:w=window.location.search
-if(w.length!==0)w=J.fE(w,1)
+aj:[function(){var z=0,y=P.dq(),x,w,v,u,t,s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7
+var $async$aj=P.f3(function(a8,a9){if(a8===1)return P.eT(a9,y)
+while(true)switch(z){case 0:w={}
+v=window.location.search
+if(v.length!==0)v=J.fE(v,1)
 else{window.alert("invalid star id!")
 z=1
 break}K.lI("AIzaSyDSEG_xCVQrYrDiEbc9LI2zGFuAzhNMLMA","hades-star-a1bff.firebaseapp.com","https://hades-star-a1bff.firebaseio.com","927697248914",null,"hades-star-a1bff","hades-star-a1bff.appspot.com")
-v=firebase.database()
-u=F.h7(v)
-t=J.q(u)
-a1=J
-a2=H
-a3=J
-z=3
-return P.aA(J.bG(J.bd(t.O(u,"stars"),w),"value"),$async$aj)
-case 3:s=a1.al(a2.O(a3.bE(a8).G(),"$isB"))
-r=J.G(s)
-q=H.a1(r.h(s,"height"))
-if(q==null)q=null
-p=H.a1(r.h(s,"width"))
-if(p==null)p=null
-o=H.d1(r.h(s,"firebaseId"))
-n=H.d1(r.h(s,"name"))
-m=H.w([],[S.cz])
-l=H.w([],[T.e6])
-k=H.w([],[F.cr])
-j=new Q.it(n,0,0,q,p,m,l,k,o)
-o=H.a1(r.h(s,"x"))
-j.c=o==null?null:o
-s=H.a1(r.h(s,"y"))
-j.d=s==null?null:s
-a1=C.a
-a2=l
-a3=J
+u=firebase.database()
+t=F.h7(u)
+s=J.q(t)
+a2=J
+a3=H
 a4=J
-a5=H
-a6=J
+z=3
+return P.aA(J.bG(J.bd(s.O(t,"stars"),v),"value"),$async$aj)
+case 3:r=a2.al(a3.O(a4.bE(a9).G(),"$isB"))
+q=J.G(r)
+p=H.a1(q.h(r,"height"))
+if(p==null)p=null
+o=H.a1(q.h(r,"width"))
+if(o==null)o=null
+n=H.d1(q.h(r,"firebaseId"))
+m=H.d1(q.h(r,"name"))
+l=H.w([],[S.cz])
+k=H.w([],[T.e6])
+j=H.w([],[F.cr])
+i=new Q.it(m,0,0,p,o,l,k,j,n)
+n=H.a1(q.h(r,"x"))
+i.c=n==null?null:n
+r=H.a1(q.h(r,"y"))
+i.d=r==null?null:r
+a2=C.a
+a3=k
+a4=J
+a5=J
+a6=H
+a7=J
 z=4
-return P.aA(J.bG(t.O(u,"/sectors/"+w),"value"),$async$aj)
-case 4:a1.ao(a2,a3.bf(a4.bF(a5.O(a6.bE(a8).G(),"$isB")),new Q.lY()))
-i=t.O(u,"/planets/"+w)
-z=i==null?5:6
+return P.aA(J.bG(s.O(t,"/sectors/"+v),"value"),$async$aj)
+case 4:a2.ao(a3,a4.bf(a5.bF(a6.O(a7.bE(a9).G(),"$isB")),new Q.lY()))
+h=s.O(t,"/planets/"+v)
+w.a=h
+z=h==null?5:7
 break
-case 5:z=7
-return P.aA(J.am(J.cd(t.O(u,"planets"),w),P.aq()),$async$aj)
-case 7:case 6:a1=H
-a2=J
+case 5:h=J.cd(s.O(t,"planets"),v)
+w.a=h
 z=8
-return P.aA(J.bG(i,"value"),$async$aj)
-case 8:h=a1.O(a2.bE(a8).G(),"$isB")
-if(h!=null)C.a.ao(m,J.bf(J.bF(h),new Q.lZ()))
-g=t.O(u,"/jump_gates/"+w)
-z=g==null?9:10
+return P.aA(J.am(h,P.aq()),$async$aj)
+case 8:r=h
+z=6
 break
-case 9:z=11
-return P.aA(J.am(J.cd(t.O(u,"jump_gates"),w),P.aq()),$async$aj)
-case 11:case 10:a1=H
-a2=J
-z=12
-return P.aA(J.bG(g,"value"),$async$aj)
-case 12:f=a1.O(a2.bE(a8).G(),"$isB")
-if(f!=null)C.a.ao(k,J.bf(J.bF(f),new Q.m_()))
-e=new R.hq(j,0.3)
-t=document
-d=H.O(t.body.querySelector("#game"),"$isdn")
-c=J.d7(p)
-b=J.d7(q)
-q=d.style
-p=""+c+"px"
-q.width=p
-s=""+b+"px"
-q.height=s
-d.width=c
-d.height=b
-d.toString
-d.getContext("2d").scale(0.3,0.3)
-Q.c3(j,d,e)
-s=J.fy(t.body.querySelector("#add_planet"))
-W.b7(s.a,s.b,new Q.m0(i,j),!1)
-a=H.O(t.body.querySelector("#add_jg"),"$isdm")
-a0=H.O(t.body.querySelector("#jg_sector"),"$isdL")
-a.toString
-W.b7(a,"click",new Q.m1(a0,j,g),!1)
-W.b7(d,"mousedown",new Q.m2(j,e,d,u),!1)
-t=new Q.lW(j,d,e)
-i.gcN().aY(t)
-i.gcM().aY(t)
-t=new Q.lX(j,d,e)
-g.gcN().aY(t)
-g.gcM().aY(t)
+case 7:r=h
+case 6:a2=H
+a3=J
+z=9
+return P.aA(J.bG(r,"value"),$async$aj)
+case 9:g=a2.O(a3.bE(a9).G(),"$isB")
+if(g!=null)C.a.ao(l,J.bf(J.bF(g),new Q.lZ()))
+f=s.O(t,"/jump_gates/"+v)
+w.b=f
+z=f==null?10:12
+break
+case 10:f=J.cd(s.O(t,"jump_gates"),v)
+w.b=f
+z=13
+return P.aA(J.am(f,P.aq()),$async$aj)
+case 13:s=f
+z=11
+break
+case 12:s=f
+case 11:a2=H
+a3=J
+z=14
+return P.aA(J.bG(s,"value"),$async$aj)
+case 14:e=a2.O(a3.bE(a9).G(),"$isB")
+if(e!=null)C.a.ao(j,J.bf(J.bF(e),new Q.m_()))
+d=new R.hq(i,0.3)
+s=document
+c=H.O(s.body.querySelector("#game"),"$isdn")
+b=J.d7(o)
+a=J.d7(p)
+p=c.style
+o=""+b+"px"
+p.width=o
+r=""+a+"px"
+p.height=r
+c.width=b
+c.height=a
+c.toString
+c.getContext("2d").scale(0.3,0.3)
+Q.c3(i,c,d)
+r=J.fy(s.body.querySelector("#add_planet"))
+W.b7(r.a,r.b,new Q.m0(w,i),!1)
+a0=H.O(s.body.querySelector("#add_jg"),"$isdm")
+a1=H.O(s.body.querySelector("#jg_sector"),"$isdL")
+a0.toString
+W.b7(a0,"click",new Q.m1(w,a1,i),!1)
+W.b7(c,"mousedown",new Q.m2(i,d,c,t),!1)
+s=new Q.lW(i,c,d)
+w.a.gcN().aY(s)
+w.a.gcM().aY(s)
+s=new Q.lX(i,c,d)
+w.b.gcN().aY(s)
+w.b.gcM().aY(s)
 case 1:return P.eU(x,y)}})
 return P.eV($async$aj,y)},"$0","fo",0,0,0],
 c3:function(a,b,c){var z
@@ -5240,17 +5255,17 @@ $1:[function(a){return F.ep(J.al(H.O(a,"$isB")))},null,null,4,0,null,31,"call"]}
 m0:{"^":"c:1;a,b",
 $1:function(a){var z=$.$get$cC()
 if(typeof z!=="number")return z.aI()
-J.am(J.bd(this.a,C.c.j(this.b.r.length)),new S.cz(250,z/2).G())}},
+J.am(J.bd(this.a.a,C.c.j(this.b.r.length)),new S.cz(250,z/2).G())}},
 m1:{"^":"c:1;a,b,c",
 $1:function(a){var z,y,x,w,v
-z=this.a.value
-y=this.b
+z=this.b.value
+y=this.c
 x=C.a.eq(y.x,new Q.lU(z),new Q.lV(z))
 if(x==null)return
 w=J.q(x)
 v=J.d4(w.gl(x),25)
 w=J.d4(w.gn(x),25)
-J.am(J.bd(this.c,C.c.j(y.y.length)),new F.cr(v,w).G())}},
+J.am(J.bd(this.a.b,C.c.j(y.y.length)),new F.cr(v,w).G())}},
 lU:{"^":"c:1;a",
 $1:function(a){return J.T(J.db(a),this.a.toLowerCase())}},
 lV:{"^":"c:0;a",
