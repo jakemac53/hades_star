@@ -27,8 +27,9 @@ main() async {
     var starRef = database.ref('stars').push();
     var star = new Star.withLayers(4, starRef.key, name);
     await starRef.set(star.toJson());
+    print(starRef.key);
 
-    var sectorsRef = database.ref('/sectors/${starRef.key}');
+    var sectorsRef = database.ref('/sectors/${star.firebaseId}');
     await sectorsRef
         .set(star.sectors.map((sector) => sector.toJson()).toList());
   });
