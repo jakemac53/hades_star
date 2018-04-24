@@ -16,6 +16,7 @@ main() async {
 
   var createStar = document.body.querySelector('#create_star') as ButtonElement;
   var starName = document.body.querySelector('#star_name') as InputElement;
+  var creatingSpan = document.body.querySelector('#creating') as SpanElement;
 
   // ignore: unawaited_futures
   createStar.onClick.first.then((_) async {
@@ -24,6 +25,8 @@ main() async {
       window.alert('You must give the star a name first!');
       return;
     }
+    starName.value = '';
+    creatingSpan.text = 'creating...';
     var starRef = database.ref('stars').push();
     var star = new Star.withLayers(4, starRef.key, name);
 
@@ -40,6 +43,7 @@ main() async {
 
   var starList = document.body.querySelector('#existing_stars') as UListElement;
   database.ref('stars').onChildAdded.listen((event) {
+    creatingSpan.text = '';
     var star = new Star.fromJson(
         (event.snapshot.toJson() as Map).cast<String, dynamic>());
     var href = 'star.html?${star.firebaseId}';
