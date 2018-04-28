@@ -168,26 +168,25 @@ main() async {
     if (selected.isEmpty) return;
     if (star.isLocked) return;
     e.preventDefault();
-    for (var planet in selected) {
-      var modifier = e.shiftKey ? 10 : 1;
-      switch (e.keyCode) {
-        case KeyCode.UP:
-          planet.y -= 1 * modifier;
-          break;
-        case KeyCode.RIGHT:
-          planet.x += 1 * modifier;
-          break;
-        case KeyCode.DOWN:
-          planet.y += 1 * modifier;
-          break;
-        case KeyCode.LEFT:
-          planet.x -= 1 * modifier;
-          break;
-        default:
-          return;
-      }
-      _updatePlanet(planet, database, gameCtx);
+    var planet = selected.last;
+    var modifier = e.shiftKey ? 10 : 1;
+    switch (e.keyCode) {
+      case KeyCode.UP:
+        planet.y -= 1 * modifier;
+        break;
+      case KeyCode.RIGHT:
+        planet.x += 1 * modifier;
+        break;
+      case KeyCode.DOWN:
+        planet.y += 1 * modifier;
+        break;
+      case KeyCode.LEFT:
+        planet.x -= 1 * modifier;
+        break;
+      default:
+        return;
     }
+    _updatePlanet(planet, database, gameCtx);
     _drawStar(star, canvas, gameCtx);
   });
 
