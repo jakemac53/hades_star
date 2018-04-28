@@ -37,6 +37,11 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   @JsonKey(ignore: true)
   final List<JumpGate> jumpGates;
 
+  Iterable<GameObject> get children => <GameObject>[]
+      .followedBy(planets)
+      .followedBy(sectors)
+      .followedBy(jumpGates);
+
   Star._(
       {@required this.height,
       @required this.width,
@@ -110,14 +115,17 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
     renderCtx.setStrokeColorRgb(0, 255, 0);
     renderCtx.font = '40px sans-serif';
     renderCtx.setFillColorRgb(255, 255, 255);
-    var objects = new List<DockingPoint>.from(planets)..addAll(jumpGates);
-    for (var planet in planets) {
-      objects.remove(planet);
-      _drawDistances(planet, objects, renderCtx);
+    var selected = planets.where((p) => p.isSelected);
+    if (selected.isNotEmpty) {
+      var toObjects = <DockingPoint>[]..addAll(planets)..addAll(jumpGates);
+      for (var planet in selected) {
+        toObjects.remove(planet);
+        _drawDistances(planet, toObjects, renderCtx);
+      }
     }
   }
 
-  void _drawDistances(Planet planet, List<DockingPoint> objects,
+  void _drawDistances(Planet planet, Iterable<DockingPoint> objects,
       CanvasRenderingContext2D renderCtx) {
     for (var object in objects) {
       _drawDistance(planet, object, renderCtx);

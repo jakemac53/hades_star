@@ -9,6 +9,8 @@ import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
+final selected = <Planet>[];
+
 main() async {
   var starId = window.location.search;
   if (starId.isNotEmpty) {
@@ -107,25 +109,79 @@ main() async {
   });
 
   canvas.onMouseDown.listen((e) {
+    e.preventDefault();
     var x = e.client.x;
     var y = e.client.y;
+    if (!e.ctrlKey) {
+      for (var planet in selected) {
+        planet.deselect();
+      }
+      selected.clear();
+    }
     for (var planet in star.planets) {
-      if (_rectCollide(x, y, planet, gameCtx.scale)) {
+      if (rectCollide(x, y, planet, gameCtx.scale)) {
+        selected.add(planet);
+        planet.select();
         planet.startDrag(e, canvas, gameCtx).listen((_) {
           _drawStar(star, canvas, gameCtx);
         }).onDone(() {
-          _updatePlanet(star, planet, database);
+          _updatePlanet(planet, database, gameCtx);
         });
         break;
       }
     }
+    _drawStar(star, canvas, gameCtx);
+  });
+
+  document.onMouseDown.listen((e) {
+    if (e.target != canvas) {
+      for (var planet in selected) {
+        planet.deselect();
+      }
+      selected.clear();
+      _drawStar(star, canvas, gameCtx);
+    }
+  });
+
+  document.onKeyDown.listen((KeyboardEvent e) {
+    if (selected.isEmpty) return;
+    e.preventDefault();
+    for (var planet in selected) {
+      var modifier = e.shiftKey ? 10 : 1;
+      switch (e.keyCode) {
+        case KeyCode.UP:
+          planet.y -= 1 * modifier;
+          break;
+        case KeyCode.RIGHT:
+          planet.x += 1 * modifier;
+          break;
+        case KeyCode.DOWN:
+          planet.y += 1 * modifier;
+          break;
+        case KeyCode.LEFT:
+          planet.x -= 1 * modifier;
+          break;
+        default:
+          return;
+      }
+      _updatePlanet(planet, database, gameCtx);
+    }
+    _drawStar(star, canvas, gameCtx);
   });
 
   void _onPlanetUpdate(firebase.QueryEvent event) {
     var position = int.parse(event.snapshot.key);
     if (position >= star.planets.length) star.planets.length = position + 1;
-    star.planets[position] = new Planet.fromJson(
+    var existing = star.planets[position];
+    var updated = new Planet.fromJson(
         (event.snapshot.toJson() as Map).cast<String, dynamic>());
+    if (existing == null) {
+      star.planets[position] = updated;
+    } else {
+      existing
+        ..x = updated.x
+        ..y = updated.y;
+    }
     _drawStar(star, canvas, gameCtx);
   }
 
@@ -151,40 +207,36 @@ void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {
   gameCtx.star.draw(renderCtx, gameCtx);
 }
 
-bool _rectCollide(num x, num y, GameObject object, num scale) {
-  x = x / scale;
-  y = y / scale;
-  var width = object.width / scale;
-  var height = object.height / scale;
-  if (x < object.x || x > object.x + width) return false;
-  if (y < object.y || y > object.y + height) return false;
-  return true;
-}
-
 bool _updating = false;
-Star _nextUpdateStar;
-Planet _nextUpdatePlanet;
+final _planetsToUpdate = <Planet>[];
 
-Future _updatePlanet(Star star, Planet planet, firebase.Database db) async {
-  var savingSpan = document.body.querySelector('#saving');
+Future _updatePlanet(
+    Planet planet, firebase.Database db, GameContext ctx) async {
   if (_updating) {
-    _nextUpdateStar = star;
-    _nextUpdatePlanet = planet;
+    if (!_planetsToUpdate.contains(planet)) {
+      _planetsToUpdate.add(planet);
+    }
     return;
   }
+  var savingSpan = document.body.querySelector('#saving');
   savingSpan.text = 'saving...';
   _updating = true;
 
-  var planetRef =
-      db.ref('/planets/${star.firebaseId}/${star.planets.indexOf(planet)}');
+  var star = ctx.star;
+  var index = star.planets.indexOf(planet);
+  if (index == -1) {
+    print('Unable to find $planet');
+    return;
+  }
+  var planetRef = db.ref('/planets/${star.firebaseId}/$index');
   await planetRef.set(planet.toJson());
 
   savingSpan.text = 'done!';
   _updating = false;
-  if (_nextUpdateStar != null) {
-    _nextUpdateStar = null;
-    _nextUpdatePlanet = null;
+  if (_planetsToUpdate.isNotEmpty) {
+    var next = _planetsToUpdate.first;
+    _planetsToUpdate.remove(next);
     // ignore: unawaited_futures
-    _updatePlanet(_nextUpdateStar, _nextUpdatePlanet, db);
+    _updatePlanet(next, db, ctx);
   }
 }

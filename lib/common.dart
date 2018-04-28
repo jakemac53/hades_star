@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:html';
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 import 'star.dart';
@@ -12,6 +13,19 @@ abstract class DockingPoint implements GameObject {
       new SimplePosition(x: centerX, y: y + height + dockingPointOffset);
 }
 
+abstract class Selectable implements GameObject {
+  @JsonKey(ignore: true)
+  bool isSelected = false;
+
+  void select() {
+    isSelected = true;
+  }
+
+  void deselect() {
+    isSelected = false;
+  }
+}
+
 abstract class Draggable implements Position {
   Stream<Null> startDrag(MouseEvent e, CanvasElement el, GameContext gameCtx) {
     var controller = new StreamController<Null>();
@@ -19,6 +33,7 @@ abstract class Draggable implements Position {
     var startMousePos = e.client;
     var subscriptions = <StreamSubscription>[];
     subscriptions.add(el.onMouseMove.listen((MouseEvent moveEvent) {
+      moveEvent.preventDefault();
       var newPos = moveEvent.client;
       var offset =
           new Point(newPos.x - startMousePos.x, newPos.y - startMousePos.y);
@@ -26,7 +41,8 @@ abstract class Draggable implements Position {
       y = startObjectPos.y + offset.y / gameCtx.scale;
       controller.add(null);
     }));
-    subscriptions.add(el.onMouseUp.listen((_) {
+    subscriptions.add(el.onMouseUp.listen((e) {
+      e.preventDefault();
       for (var subscription in subscriptions) {
         subscription.cancel();
       }
@@ -74,4 +90,14 @@ class SimplePosition implements Position {
   double y;
 
   SimplePosition({@required this.x, @required this.y});
+}
+
+bool rectCollide(num x, num y, GameObject object, num scale) {
+  x = x / scale;
+  y = y / scale;
+  var width = object.width / scale;
+  var height = object.height / scale;
+  if (x < object.x || x > object.x + width) return false;
+  if (y < object.y || y > object.y + height) return false;
+  return true;
 }

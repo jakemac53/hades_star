@@ -10,7 +10,7 @@ part 'planet.g.dart';
 
 @JsonSerializable()
 class Planet extends GameObject
-    with Draggable, DockingPoint, _$PlanetSerializerMixin {
+    with Draggable, DockingPoint, Selectable, _$PlanetSerializerMixin {
   static const SIZE = 60.0;
 
   @override
@@ -33,5 +33,15 @@ class Planet extends GameObject
     renderCtx.beginPath();
     renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
     renderCtx.fill();
+
+    if (isSelected) {
+      renderCtx.setStrokeColorRgb(255, 255, 255);
+      renderCtx.beginPath();
+      renderCtx.arc(centerX, centerY, width / 2 + 8, 0, math.pi * 2);
+      var oldLineWidth = renderCtx.lineWidth;
+      renderCtx.lineWidth = 6;
+      renderCtx.stroke();
+      renderCtx.lineWidth = oldLineWidth;
+    }
   }
 }
