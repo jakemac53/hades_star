@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:html';
+import 'dart:math' as math;
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
@@ -24,9 +25,20 @@ abstract class Selectable implements GameObject {
   void deselect() {
     isSelected = false;
   }
+
+  void drawSelectionCircle(CanvasRenderingContext2D renderCtx) {
+    if (!isSelected) return;
+    renderCtx.setStrokeColorRgb(255, 255, 255);
+    renderCtx.beginPath();
+    renderCtx.arc(centerX, centerY, width / 2 + 8, 0, math.pi * 2);
+    var oldLineWidth = renderCtx.lineWidth;
+    renderCtx.lineWidth = 6;
+    renderCtx.stroke();
+    renderCtx.lineWidth = oldLineWidth;
+  }
 }
 
-abstract class Draggable implements Position {
+abstract class Draggable implements GameObject {
   Stream<Null> startDrag(MouseEvent e, CanvasElement el, GameContext gameCtx) {
     var controller = new StreamController<Null>();
     var startObjectPos = new Point(x, y);

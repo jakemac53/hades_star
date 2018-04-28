@@ -9,7 +9,8 @@ import 'common.dart';
 part 'jump_gate.g.dart';
 
 @JsonSerializable()
-class JumpGate extends GameObject with DockingPoint, _$JumpGateSerializerMixin {
+class JumpGate extends GameObject
+    with DockingPoint, Selectable, _$JumpGateSerializerMixin {
   static final SIZE = 50.0;
 
   @override
@@ -35,5 +36,7 @@ class JumpGate extends GameObject with DockingPoint, _$JumpGateSerializerMixin {
     renderCtx.beginPath();
     renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
     renderCtx.fill();
+
+    drawSelectionCircle(renderCtx);
   }
 }

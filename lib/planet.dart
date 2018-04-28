@@ -34,14 +34,6 @@ class Planet extends GameObject
     renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
     renderCtx.fill();
 
-    if (isSelected) {
-      renderCtx.setStrokeColorRgb(255, 255, 255);
-      renderCtx.beginPath();
-      renderCtx.arc(centerX, centerY, width / 2 + 8, 0, math.pi * 2);
-      var oldLineWidth = renderCtx.lineWidth;
-      renderCtx.lineWidth = 6;
-      renderCtx.stroke();
-      renderCtx.lineWidth = oldLineWidth;
-    }
+    drawSelectionCircle(renderCtx);
   }
 }

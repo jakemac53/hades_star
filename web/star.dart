@@ -9,7 +9,7 @@ import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
-final selected = <Planet>[];
+final selected = <Selectable>[];
 
 main() async {
   var starId = window.location.search;
@@ -128,25 +128,32 @@ main() async {
 
   canvas.onMouseDown.listen((e) {
     e.preventDefault();
-    var x = e.client.x;
-    var y = e.client.y;
+    var x = e.offset.x;
+    var y = e.offset.y;
+
     if (!e.ctrlKey) {
-      for (var planet in selected) {
-        planet.deselect();
+      for (var object in selected) {
+        object.deselect();
       }
       selected.clear();
     }
-    for (var planet in star.planets) {
-      if (rectCollide(x, y, planet, gameCtx.scale)) {
-        selected.add(planet);
-        planet.select();
-        if (!star.isLocked) {
-          planet.startDrag(e, canvas, gameCtx).listen((_) {
-            _drawStar(star, canvas, gameCtx);
-            _updatePlanet(planet, database, gameCtx);
-          }).onDone(() {
-            _updatePlanet(planet, database, gameCtx);
-          });
+    for (var selectable in star.selectables) {
+      if (rectCollide(x, y, selectable, gameCtx.scale)) {
+        if (selected.contains(selectable)) {
+          selected.remove(selectable);
+          selectable.deselect();
+        } else {
+          selected.add(selectable);
+          selectable.select();
+          if (!star.isLocked && selectable is Draggable) {
+            var draggable = selectable as Draggable;
+            draggable.startDrag(e, canvas, gameCtx).listen((_) {
+              _drawStar(star, canvas, gameCtx);
+              _updateObject(draggable, database, gameCtx);
+            }).onDone(() {
+              _updateObject(draggable, database, gameCtx);
+            });
+          }
         }
         break;
       }
@@ -168,25 +175,27 @@ main() async {
     if (selected.isEmpty) return;
     if (star.isLocked) return;
     e.preventDefault();
-    var planet = selected.last;
-    var modifier = e.shiftKey ? 10 : 1;
-    switch (e.keyCode) {
-      case KeyCode.UP:
-        planet.y -= 1 * modifier;
-        break;
-      case KeyCode.RIGHT:
-        planet.x += 1 * modifier;
-        break;
-      case KeyCode.DOWN:
-        planet.y += 1 * modifier;
-        break;
-      case KeyCode.LEFT:
-        planet.x -= 1 * modifier;
-        break;
-      default:
-        return;
+    var last = selected.last;
+    if (last is Planet) {
+      var modifier = e.shiftKey ? 10 : 1;
+      switch (e.keyCode) {
+        case KeyCode.UP:
+          last.y -= 1 * modifier;
+          break;
+        case KeyCode.RIGHT:
+          last.x += 1 * modifier;
+          break;
+        case KeyCode.DOWN:
+          last.y += 1 * modifier;
+          break;
+        case KeyCode.LEFT:
+          last.x -= 1 * modifier;
+          break;
+        default:
+          return;
+      }
+      _updateObject(last, database, gameCtx);
     }
-    _updatePlanet(planet, database, gameCtx);
     _drawStar(star, canvas, gameCtx);
   });
 
@@ -229,13 +238,13 @@ void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {
 }
 
 bool _updating = false;
-final _planetsToUpdate = <Planet>[];
+final _objectsToUpdate = <GameObject>[];
 
-Future _updatePlanet(
-    Planet planet, firebase.Database db, GameContext ctx) async {
+Future _updateObject(
+    GameObject object, firebase.Database db, GameContext ctx) async {
   if (_updating) {
-    if (!_planetsToUpdate.contains(planet)) {
-      _planetsToUpdate.add(planet);
+    if (!_objectsToUpdate.contains(object)) {
+      _objectsToUpdate.add(object);
     }
     return;
   }
@@ -244,28 +253,35 @@ Future _updatePlanet(
   _updating = true;
 
   var star = ctx.star;
-  var index = star.planets.indexOf(planet);
-  if (index == -1) {
-    print('Unable to find $planet');
-    return;
+  if (object is Planet) {
+    await _updatePlanet(object, star, db);
+  } else {
+    throw new UnsupportedError('Tried to update $object but didn\'t know how');
   }
-  var planetRef = db.ref('/planets/${star.firebaseId}/$index');
-  await planetRef.set(planet.toJson());
 
   savingSpan.text = 'done!';
-  new Future.delayed(new Duration(milliseconds: 250), () {
-    savingSpan.text = '';
-    _updating = false;
-    if (_planetsToUpdate.isNotEmpty) {
-      var next = _planetsToUpdate.first;
-      _planetsToUpdate.remove(next);
-      // ignore: unawaited_futures
-      _updatePlanet(next, db, ctx);
-    }
-  });
+  await new Future.delayed(new Duration(milliseconds: 250));
+
+  savingSpan.text = '';
+  _updating = false;
+  if (_objectsToUpdate.isNotEmpty) {
+    var next = _objectsToUpdate.first;
+    _objectsToUpdate.remove(next);
+    // ignore: unawaited_futures
+    _updateObject(next, db, ctx);
+  }
 }
 
-void _updateStar(Star star, firebase.Database db) {
+Future _updatePlanet(Planet planet, Star star, firebase.Database db) {
+  var index = star.planets.indexOf(planet);
+  if (index == -1) {
+    throw new StateError('Unable to find $planet');
+  }
+  var planetRef = db.ref('/planets/${star.firebaseId}/$index');
+  return planetRef.set(planet.toJson());
+}
+
+Future _updateStar(Star star, firebase.Database db) {
   var starRef = db.ref('stars').child(star.firebaseId);
-  starRef.set(star.toJson());
+  return starRef.set(star.toJson());
 }

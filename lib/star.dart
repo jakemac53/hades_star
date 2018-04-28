@@ -40,10 +40,8 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   @JsonKey(ignore: true)
   final List<JumpGate> jumpGates;
 
-  Iterable<GameObject> get children => <GameObject>[]
-      .followedBy(planets)
-      .followedBy(sectors)
-      .followedBy(jumpGates);
+  Iterable<Selectable> get selectables =>
+      <Selectable>[].followedBy(planets).followedBy(jumpGates);
 
   Star._(
       {@required this.height,
@@ -120,40 +118,41 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
     renderCtx.setStrokeColorRgb(0, 255, 0);
     renderCtx.font = '40px sans-serif';
     renderCtx.setFillColorRgb(255, 255, 255);
-    var selected = planets.where((p) => p.isSelected);
-    if (selected.isNotEmpty) {
-      var toObjects = <DockingPoint>[]..addAll(planets)..addAll(jumpGates);
-      for (var planet in selected) {
-        toObjects.remove(planet);
-        _drawDistances(planet, toObjects, renderCtx);
+    var selectedObjects = selectables.where((s) => s.isSelected);
+    if (selectedObjects.isNotEmpty) {
+      var toObjects = <GameObject>[]..addAll(planets)..addAll(jumpGates);
+      for (var selected in selectedObjects) {
+        toObjects.remove(selected);
+        _drawDistances(selected, toObjects, renderCtx);
       }
     }
   }
 
-  void _drawDistances(Planet planet, Iterable<DockingPoint> objects,
+  void _drawDistances(GameObject from, Iterable<GameObject> toObjects,
       CanvasRenderingContext2D renderCtx) {
-    for (var object in objects) {
-      _drawDistance(planet, object, renderCtx);
+    var fromPoint = from is DockingPoint ? from.dockingPoint : from;
+    for (var to in toObjects) {
+      var toPoint = to is DockingPoint ? to.dockingPoint : to;
+      _drawDistance(fromPoint, toPoint, renderCtx);
     }
   }
 
   void _drawDistance(
-      DockingPoint from, DockingPoint to, CanvasRenderingContext2D renderCtx) {
+      Position from, Position to, CanvasRenderingContext2D renderCtx) {
     var oldWidth = renderCtx.lineWidth;
     renderCtx.lineWidth = 4;
     renderCtx.setLineDash([8, 24]);
-    renderCtx.moveTo(from.dockingPoint.x, from.dockingPoint.y);
-    renderCtx.lineTo(to.dockingPoint.x, to.dockingPoint.y);
+    renderCtx.moveTo(from.x, from.y);
+    renderCtx.lineTo(to.x, to.y);
     renderCtx.stroke();
     renderCtx.setLineDash([]);
     renderCtx.lineWidth = oldWidth;
 
-    var xDiff = from.dockingPoint.x - to.dockingPoint.x;
-    var yDiff = from.dockingPoint.y - to.dockingPoint.y;
+    var xDiff = from.x - to.x;
+    var yDiff = from.y - to.y;
     var distance =
         math.sqrt(math.pow(xDiff.abs(), 2) + math.pow(yDiff.abs(), 2)).round();
-    renderCtx.fillText('${distance}au', from.dockingPoint.x - xDiff / 2,
-        from.dockingPoint.y - yDiff / 2);
+    renderCtx.fillText('${distance}au', from.x - xDiff / 2, from.y - yDiff / 2);
     renderCtx.lineWidth = oldWidth;
   }
 }
