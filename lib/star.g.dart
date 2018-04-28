@@ -7,6 +7,7 @@ part of 'star.dart';
 // **************************************************************************
 
 Star _$StarFromJson(Map<String, dynamic> json) => new Star(
+    isLocked: json['isLocked'] as bool,
     height: (json['height'] as num)?.toDouble(),
     width: (json['width'] as num)?.toDouble(),
     firebaseId: json['firebaseId'] as String,
@@ -21,12 +22,14 @@ abstract class _$StarSerializerMixin {
   double get y;
   double get height;
   double get width;
+  bool get isLocked;
   Map<String, dynamic> toJson() => <String, dynamic>{
         'firebaseId': firebaseId,
         'name': name,
         'x': x,
         'y': y,
         'height': height,
-        'width': width
+        'width': width,
+        'isLocked': isLocked
       };
 }

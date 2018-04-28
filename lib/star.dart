@@ -28,6 +28,9 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   @override
   final double width;
 
+  @override
+  bool isLocked = false;
+
   @JsonKey(ignore: true)
   final List<Planet> planets;
 
@@ -73,6 +76,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       {List<JumpGate> jumpGates,
       List<Planet> planets,
       List<Sector> sectors,
+      bool isLocked,
       @required this.height,
       @required this.width,
       @required String firebaseId,
@@ -80,6 +84,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       : planets = planets ?? <Planet>[],
         sectors = sectors ?? <Sector>[],
         jumpGates = jumpGates ?? <JumpGate>[],
+        isLocked = isLocked ?? false,
         super(firebaseId);
 
   // Create a star with [numLayers] layers of hexes making up the overall hex.

@@ -28,9 +28,8 @@ main() async {
       storageBucket: 'hades-star-a1bff.appspot.com',
       messagingSenderId: '927697248914');
   var database = firebase.database();
-  var starJson = (await database.ref('stars').child(starId).once('value'))
-      .snapshot
-      .toJson() as Map;
+  var starRef = database.ref('stars').child(starId);
+  var starJson = (await starRef.once('value')).snapshot.toJson() as Map;
   var star = new Star.fromJson(starJson.cast<String, dynamic>());
 
   var sectorsRef = database.ref('/sectors/$starId');
@@ -82,8 +81,26 @@ main() async {
   canvas.context2D.scale(gameCtx.scale, gameCtx.scale);
   _drawStar(star, canvas, gameCtx);
 
+  var lockStarBox =
+      document.body.querySelector('#lock_star') as CheckboxInputElement;
+  if (star.isLocked) {
+    lockStarBox.checked = true;
+  }
+  lockStarBox.onChange.listen((e) {
+    if (star.isLocked == lockStarBox.checked) return;
+    star.isLocked = lockStarBox.checked;
+    _updateStar(star, database);
+  });
+  starRef.child('isLocked').onValue.listen((e) {
+    var locked = e.snapshot.toJson() as bool;
+    if (star.isLocked == locked) return;
+    star.isLocked = locked;
+    lockStarBox.checked = locked;
+  });
+
   var newPlanetButton = document.body.querySelector('#add_planet');
   newPlanetButton.onClick.listen((_) {
+    if (star.isLocked) return;
     var planet = new Planet(x: Sector.WIDTH / 2, y: Sector.HEIGHT / 2);
     var ref = planetsRef.child(star.planets.length.toString());
     ref.set(planet.toJson());
@@ -94,6 +111,7 @@ main() async {
   var newJumpGateSectorInput =
       document.body.querySelector('#jg_sector') as InputElement;
   newJumpGateButton.onClick.listen((_) {
+    if (star.isLocked) return;
     var sectorName = newJumpGateSectorInput.value;
     var sector = star.sectors
         .firstWhere((s) => s.name == sectorName.toLowerCase(), orElse: () {
@@ -122,12 +140,14 @@ main() async {
       if (rectCollide(x, y, planet, gameCtx.scale)) {
         selected.add(planet);
         planet.select();
-        planet.startDrag(e, canvas, gameCtx).listen((_) {
-          _drawStar(star, canvas, gameCtx);
-          _updatePlanet(planet, database, gameCtx);
-        }).onDone(() {
-          _updatePlanet(planet, database, gameCtx);
-        });
+        if (!star.isLocked) {
+          planet.startDrag(e, canvas, gameCtx).listen((_) {
+            _drawStar(star, canvas, gameCtx);
+            _updatePlanet(planet, database, gameCtx);
+          }).onDone(() {
+            _updatePlanet(planet, database, gameCtx);
+          });
+        }
         break;
       }
     }
@@ -146,6 +166,7 @@ main() async {
 
   document.onKeyDown.listen((KeyboardEvent e) {
     if (selected.isEmpty) return;
+    if (star.isLocked) return;
     e.preventDefault();
     for (var planet in selected) {
       var modifier = e.shiftKey ? 10 : 1;
@@ -243,4 +264,9 @@ Future _updatePlanet(
       _updatePlanet(next, db, ctx);
     }
   });
+}
+
+void _updateStar(Star star, firebase.Database db) {
+  var starRef = db.ref('stars').child(star.firebaseId);
+  starRef.set(star.toJson());
 }
