@@ -124,6 +124,7 @@ main() async {
         planet.select();
         planet.startDrag(e, canvas, gameCtx).listen((_) {
           _drawStar(star, canvas, gameCtx);
+          _updatePlanet(planet, database, gameCtx);
         }).onDone(() {
           _updatePlanet(planet, database, gameCtx);
         });
@@ -232,11 +233,14 @@ Future _updatePlanet(
   await planetRef.set(planet.toJson());
 
   savingSpan.text = 'done!';
-  _updating = false;
-  if (_planetsToUpdate.isNotEmpty) {
-    var next = _planetsToUpdate.first;
-    _planetsToUpdate.remove(next);
-    // ignore: unawaited_futures
-    _updatePlanet(next, db, ctx);
-  }
+  new Future.delayed(new Duration(milliseconds: 250), () {
+    savingSpan.text = '';
+    _updating = false;
+    if (_planetsToUpdate.isNotEmpty) {
+      var next = _planetsToUpdate.first;
+      _planetsToUpdate.remove(next);
+      // ignore: unawaited_futures
+      _updatePlanet(next, db, ctx);
+    }
+  });
 }
