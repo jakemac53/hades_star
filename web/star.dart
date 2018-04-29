@@ -68,8 +68,8 @@ main() async {
   );
   var canvas = document.body.querySelector('#game') as CanvasElement;
 
-  var width = star.width.floor();
-  var height = star.height.floor();
+  var width = (star.width * gameCtx.scale).ceil();
+  var height = (star.height * gameCtx.scale).ceil();
   canvas.style
     ..width = '${width}px'
     ..height = '${height}px';
@@ -242,7 +242,8 @@ main() async {
 void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {
   var renderCtx = canvas.context2D;
   renderCtx.setFillColorRgb(0, 0, 0);
-  renderCtx.fillRect(0, 0, canvas.width, canvas.height);
+  renderCtx.fillRect(
+      0, 0, canvas.width / gameCtx.scale, canvas.height / gameCtx.scale);
   gameCtx.star.draw(renderCtx, gameCtx);
 }
 
