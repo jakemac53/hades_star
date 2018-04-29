@@ -31,12 +31,6 @@ main() async {
   var starJson = (await starRef.once('value')).snapshot.toJson() as Map;
   var star = new Star.fromJson(starJson.cast<String, dynamic>());
 
-  Map<String, dynamic> _addFirebaseId(Map<String, dynamic> json, String id) {
-    if (json.containsKey('firebaseId')) return json;
-    json['firebaseId'] = id;
-    return json;
-  }
-
   var sectorsRef = database.ref('/sectors/$starId');
   var sectorsSnapshot = (await sectorsRef.once('value')).snapshot;
   var sectorsJson = (sectorsSnapshot.toJson() as Map).cast<String, dynamic>();
@@ -48,56 +42,9 @@ main() async {
   });
   star.sectors.addAll(sectors);
 
-  var planetsRef = database.ref('/planets/$starId');
-  if (planetsRef == null) {
-    planetsRef = database.ref('planets').push(starId);
-    await planetsRef.set({});
-  }
-  var planetsSnapshot = (await planetsRef.once('value')).snapshot;
-  var planetsJson = (planetsSnapshot.toJson() as Map)?.cast<String, dynamic>();
-  if (planetsJson != null) {
-    var planets = <Planet>[];
-    planetsJson.forEach((key, planetJson) {
-      planets.add(new Planet.fromJson(
-          _addFirebaseId((planetJson as Map).cast<String, dynamic>(), key)));
-    });
-    star.planets.addAll(planets);
-  }
-
   var asteroidsRef = database.ref('/asteroids/$starId');
-  if (asteroidsRef == null) {
-    asteroidsRef = database.ref('asteroidsRef').push(starId);
-    await asteroidsRef.set({});
-  }
-  var asteroidsSnapshot = (await asteroidsRef.once('value')).snapshot;
-  var asteroidsJson =
-      (asteroidsSnapshot.toJson() as Map)?.cast<String, dynamic>();
-  if (asteroidsJson != null) {
-    var asteroids = <Asteroid>[];
-    asteroidsJson.forEach((key, asteroidJson) {
-      asteroids.add(new Asteroid.fromJson(
-          _addFirebaseId((asteroidJson as Map).cast<String, dynamic>(), key)));
-    });
-    star.asteroids.addAll(asteroids);
-  }
-
   var jumpGatesRef = database.ref('/jump_gates/$starId');
-  if (jumpGatesRef == null) {
-    jumpGatesRef = database.ref('jump_gates').push(starId);
-    await jumpGatesRef.set({});
-  }
-  var jumpGatesSnapshot = (await jumpGatesRef.once('value')).snapshot;
-  var jumpGatesJson =
-      (jumpGatesSnapshot.toJson() as Map)?.cast<String, dynamic>();
-
-  if (jumpGatesJson != null) {
-    var jumpGates = <JumpGate>[];
-    jumpGatesJson.forEach((key, jumpGateJson) {
-      jumpGates.add(new JumpGate.fromJson(
-          _addFirebaseId((jumpGateJson as Map).cast<String, dynamic>(), key)));
-    });
-    star.jumpGates.addAll(jumpGates);
-  }
+  var planetsRef = database.ref('/planets/$starId');
 
   var gameCtx = new GameContext(
     star: star,
@@ -262,11 +209,8 @@ main() async {
     var existing = star.asteroids.firstWhere(
         (asteroid) => asteroid.firebaseId == id,
         orElse: () => null);
-    var json = (event.snapshot.toJson() as Map).cast<String, dynamic>();
-    if (!json.containsKey('firebaseId')) {
-      json['firebaseId'] = event.snapshot.key;
-    }
-    var updated = new Asteroid.fromJson(json);
+    var updated = new Asteroid.fromJson(_addFirebaseId(
+        (event.snapshot.toJson() as Map).cast<String, dynamic>(), id));
     if (existing == null) {
       star.asteroids.add(updated);
     } else {
@@ -284,8 +228,8 @@ main() async {
     var id = event.snapshot.key;
     var existing =
         star.planets.firstWhere((p) => p.firebaseId == id, orElse: () => null);
-    var updated = new Planet.fromJson(
-        (event.snapshot.toJson() as Map).cast<String, dynamic>());
+    var updated = new Planet.fromJson(_addFirebaseId(
+        (event.snapshot.toJson() as Map).cast<String, dynamic>(), id));
     if (existing == null) {
       star.planets.add(updated);
     } else {
@@ -303,8 +247,8 @@ main() async {
     var id = event.snapshot.key;
     var existing = star.jumpGates
         .firstWhere((j) => j.firebaseId == id, orElse: () => null);
-    var updated = new JumpGate.fromJson(
-        (event.snapshot.toJson() as Map).cast<String, dynamic>());
+    var updated = new JumpGate.fromJson(_addFirebaseId(
+        (event.snapshot.toJson() as Map).cast<String, dynamic>(), id));
     if (existing == null) {
       star.jumpGates.add(updated);
     } else {
@@ -317,6 +261,12 @@ main() async {
 
   jumpGatesRef.onChildChanged.listen(_updateJumpGate);
   jumpGatesRef.onChildAdded.listen(_updateJumpGate);
+}
+
+Map<String, dynamic> _addFirebaseId(Map<String, dynamic> json, String id) {
+  if (json.containsKey('firebaseId')) return json;
+  json['firebaseId'] = id;
+  return json;
 }
 
 void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {

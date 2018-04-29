@@ -69,6 +69,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
         asteroids = <Asteroid>[],
         planets = <Planet>[],
         sectors = <Sector>[],
+        isLocked = false,
         super(firebaseId);
 
   Star(
