@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:html';
 import 'dart:math' as math;
 
+import 'package:firebase/firebase.dart' as firebase;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
@@ -61,30 +63,13 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   Star._(
       {@required this.height,
       @required this.width,
-      @required int numLayers,
       @required String firebaseId,
       @required this.name})
       : jumpGates = <JumpGate>[],
         asteroids = <Asteroid>[],
         planets = <Planet>[],
         sectors = <Sector>[],
-        super(firebaseId) {
-    const letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-    for (var q = -numLayers + 1; q < numLayers; q++) {
-      for (var r = -numLayers + 1; r < numLayers; r++) {
-        if (q + r < -(numLayers - 1)) continue;
-        if (q + r > (numLayers - 1)) continue;
-
-        var x = Sector.SIZE * 3 / 2 * q;
-        var y = Sector.SIZE * math.sqrt(3) * (r + q / 2);
-        var col = q + (numLayers / 2).floor() + 1;
-        var row = col < numLayers ? r + col + 1 : r + numLayers;
-        var sector = new Sector(
-            x: x + centerX, y: y + centerY, name: '${letters[col]}$row');
-        sectors.add(sector);
-      }
-    }
-  }
+        super(firebaseId);
 
   Star(
       {List<JumpGate> jumpGates,
@@ -104,7 +89,8 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
         super(firebaseId);
 
   // Create a star with [numLayers] layers of hexes making up the overall hex.
-  factory Star.withLayers(int numLayers, String firebaseId, String name) {
+  static Future<Star> createWithLayers(
+      int numLayers, String name, firebase.Database db) async {
     var totalHeight = (Sector.HEIGHT * ((numLayers - 1) * 2 + 1));
     var totalWidth = (Sector.WIDTH * ((((numLayers - 1) ~/ 2) * 2) + 1) +
         Sector.WIDTH * 0.5 * (numLayers ~/ 2) * 2);
@@ -112,12 +98,36 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       totalWidth += (2 * Sector.WIDTH * .25).floor();
     }
 
-    return new Star._(
-        numLayers: numLayers,
+    var starRef = db.ref('stars').push();
+    var star = new Star._(
         height: totalHeight,
         width: totalWidth,
-        firebaseId: firebaseId,
+        firebaseId: starRef.key,
         name: name);
+    await starRef.set(star.toJson());
+
+    const letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+    var sectorsRef = db.ref('/sectors/${star.firebaseId}');
+    for (var q = -numLayers + 1; q < numLayers; q++) {
+      for (var r = -numLayers + 1; r < numLayers; r++) {
+        if (q + r < -(numLayers - 1)) continue;
+        if (q + r > (numLayers - 1)) continue;
+
+        var x = Sector.SIZE * 3 / 2 * q;
+        var y = Sector.SIZE * math.sqrt(3) * (r + q / 2);
+        var col = q + (numLayers / 2).floor() + 1;
+        var row = col < numLayers ? r + col + 1 : r + numLayers;
+        var sectorRef = sectorsRef.push();
+        var sector = new Sector(
+            x: x + star.centerX,
+            y: y + star.centerY,
+            name: '${letters[col]}$row',
+            firebaseId: sectorRef.key);
+        star.sectors.add(sector);
+        await sectorRef.set(sector.toJson());
+      }
+    }
+    return star;
   }
 
   factory Star.fromJson(Map<String, dynamic> json) => _$StarFromJson(json);

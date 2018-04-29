@@ -87,6 +87,7 @@ abstract class Size {
 
 class FirebaseObject {
   final String firebaseId;
+
   FirebaseObject(this.firebaseId);
 }
 

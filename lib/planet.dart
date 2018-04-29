@@ -9,8 +9,13 @@ import 'common.dart';
 part 'planet.g.dart';
 
 @JsonSerializable()
-class Planet extends GameObject
-    with Draggable, DockingPoint, Selectable, _$PlanetSerializerMixin {
+class Planet extends FirebaseObject
+    with
+        Draggable,
+        DockingPoint,
+        GameObject,
+        Selectable,
+        _$PlanetSerializerMixin {
   static const SIZE = 60.0;
 
   @override
@@ -22,7 +27,8 @@ class Planet extends GameObject
   @override
   double get height => SIZE;
 
-  Planet({@required this.x, @required this.y});
+  Planet({@required this.x, @required this.y, @required String firebaseId})
+      : super(firebaseId);
 
   factory Planet.fromJson(Map<String, dynamic> json) => _$PlanetFromJson(json);
 

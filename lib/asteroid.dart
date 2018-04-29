@@ -9,13 +9,15 @@ import 'common.dart';
 part 'asteroid.g.dart';
 
 @JsonSerializable()
-class Asteroid extends GameObject
-    with Draggable, DockingPoint, Selectable, _$AsteroidSerializerMixin
-    implements FirebaseObject {
+class Asteroid extends FirebaseObject
+    with
+        Draggable,
+        DockingPoint,
+        GameObject,
+        Selectable,
+        _$AsteroidSerializerMixin {
   static const SIZE = 25.0;
 
-  @override
-  final String firebaseId;
   @override
   double x;
   @override
@@ -25,7 +27,8 @@ class Asteroid extends GameObject
   @override
   double get height => SIZE;
 
-  Asteroid({@required this.x, @required this.y, @required this.firebaseId});
+  Asteroid({@required this.x, @required this.y, @required String firebaseId})
+      : super(firebaseId);
 
   factory Asteroid.fromJson(Map<String, dynamic> json) =>
       _$AsteroidFromJson(json);

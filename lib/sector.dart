@@ -9,7 +9,7 @@ import 'common.dart';
 part 'sector.g.dart';
 
 @JsonSerializable()
-class Sector extends GameObject with _$SectorSerializerMixin {
+class Sector extends FirebaseObject with GameObject, _$SectorSerializerMixin {
   static final HEIGHT = WIDTH * math.sqrt(3) / 2;
   static const WIDTH = SIZE * 2;
   static const SIZE = 250.0;
@@ -29,8 +29,14 @@ class Sector extends GameObject with _$SectorSerializerMixin {
   @override
   final String name;
 
+  Sector(
+      {@required this.x,
+      @required this.y,
+      @required this.name,
+      @required String firebaseId})
+      : super(firebaseId);
+
   factory Sector.fromJson(Map<String, dynamic> json) => _$SectorFromJson(json);
-  Sector({@required this.x, @required this.y, @required this.name});
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {

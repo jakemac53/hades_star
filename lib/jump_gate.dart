@@ -9,8 +9,8 @@ import 'common.dart';
 part 'jump_gate.g.dart';
 
 @JsonSerializable()
-class JumpGate extends GameObject
-    with DockingPoint, Selectable, _$JumpGateSerializerMixin {
+class JumpGate extends FirebaseObject
+    with DockingPoint, GameObject, Selectable, _$JumpGateSerializerMixin {
   static final SIZE = 50.0;
 
   @override
@@ -25,7 +25,8 @@ class JumpGate extends GameObject
   @override
   double get width => SIZE;
 
-  JumpGate({@required this.x, @required this.y});
+  JumpGate({@required this.x, @required this.y, @required String firebaseId})
+      : super(firebaseId);
 
   factory JumpGate.fromJson(Map<String, dynamic> json) =>
       _$JumpGateFromJson(json);
