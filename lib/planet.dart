@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'dart:math' as math;
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
@@ -7,6 +6,10 @@ import 'package:meta/meta.dart';
 import 'common.dart';
 
 part 'planet.g.dart';
+
+final ImageElement _planetImage = () {
+  return document.getElementById('planet') as ImageElement;
+}();
 
 @JsonSerializable()
 class Planet extends FirebaseObject
@@ -34,11 +37,7 @@ class Planet extends FirebaseObject
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
-    renderCtx.setFillColorRgb(255, 0, 0);
-    renderCtx.setStrokeColorRgb(255, 0, 0);
-    renderCtx.beginPath();
-    renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
-    renderCtx.fill();
+    renderCtx.drawImageScaled(_planetImage, x, y, width, height);
 
     drawSelectionCircle(renderCtx);
   }

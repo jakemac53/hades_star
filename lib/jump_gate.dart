@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'dart:math' as math;
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
@@ -7,6 +6,10 @@ import 'package:meta/meta.dart';
 import 'common.dart';
 
 part 'jump_gate.g.dart';
+
+final ImageElement _jumpGateImage = () {
+  return document.getElementById('jump_gate') as ImageElement;
+}();
 
 @JsonSerializable()
 class JumpGate extends FirebaseObject
@@ -33,10 +36,7 @@ class JumpGate extends FirebaseObject
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
-    renderCtx.setFillColorRgb(0, 255, 255);
-    renderCtx.beginPath();
-    renderCtx.arc(centerX, centerY, width / 2, 0, math.pi * 2);
-    renderCtx.fill();
+    renderCtx.drawImageScaled(_jumpGateImage, x, y, width, height);
 
     drawSelectionCircle(renderCtx);
   }
