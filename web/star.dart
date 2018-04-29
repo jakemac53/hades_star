@@ -9,8 +9,6 @@ import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
 
-final selected = <Selectable>[];
-
 main() async {
   var starId = window.location.search;
   if (starId.isNotEmpty) {
@@ -132,28 +130,39 @@ main() async {
     var y = e.offset.y;
 
     if (!e.ctrlKey) {
-      for (var object in selected) {
+      for (var object in star.selected) {
         object.deselect();
       }
-      selected.clear();
+      star.selected.clear();
     }
     for (var selectable in star.selectables) {
       if (rectCollide(x, y, selectable, gameCtx.scale)) {
-        if (selected.contains(selectable)) {
-          selected.remove(selectable);
-          selectable.deselect();
-        } else {
-          selected.add(selectable);
+        var alreadySelected = star.selected.contains(selectable);
+        if (!alreadySelected) {
+          star.selected.add(selectable);
           selectable.select();
-          if (!star.isLocked && selectable is Draggable) {
-            var draggable = selectable as Draggable;
-            draggable.startDrag(e, canvas, gameCtx).listen((_) {
+        }
+        void unselect() {
+          star.selected.remove(selectable);
+          selectable.deselect();
+        }
+
+        if (!star.isLocked && selectable is Draggable) {
+          var draggable = selectable as Draggable;
+          var wasDragged = false;
+          draggable.startDrag(e, canvas, gameCtx).listen((_) {
+            wasDragged = true;
+            _drawStar(star, canvas, gameCtx);
+            _updateObject(draggable, database, gameCtx);
+          }).onDone(() {
+            _updateObject(draggable, database, gameCtx);
+            if (alreadySelected && !wasDragged) {
+              unselect();
               _drawStar(star, canvas, gameCtx);
-              _updateObject(draggable, database, gameCtx);
-            }).onDone(() {
-              _updateObject(draggable, database, gameCtx);
-            });
-          }
+            }
+          });
+        } else if (alreadySelected) {
+          unselect();
         }
         break;
       }
@@ -163,19 +172,19 @@ main() async {
 
   document.onMouseDown.listen((e) {
     if (e.target != canvas) {
-      for (var planet in selected) {
-        planet.deselect();
+      for (var object in star.selected) {
+        object.deselect();
       }
-      selected.clear();
+      star.selected.clear();
       _drawStar(star, canvas, gameCtx);
     }
   });
 
   document.onKeyDown.listen((KeyboardEvent e) {
-    if (selected.isEmpty) return;
+    if (star.selected.isEmpty) return;
     if (star.isLocked) return;
     e.preventDefault();
-    var last = selected.last;
+    var last = star.selected.last;
     if (last is Planet) {
       var modifier = e.shiftKey ? 10 : 1;
       switch (e.keyCode) {

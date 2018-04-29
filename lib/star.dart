@@ -43,6 +43,9 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   Iterable<Selectable> get selectables =>
       <Selectable>[].followedBy(planets).followedBy(jumpGates);
 
+  @JsonKey(ignore: true)
+  final selected = <Selectable>[];
+
   Star._(
       {@required this.height,
       @required this.width,
@@ -118,27 +121,35 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
     renderCtx.setStrokeColorRgb(0, 255, 0);
     renderCtx.font = '40px sans-serif';
     renderCtx.setFillColorRgb(255, 255, 255);
-    var selectedObjects = selectables.where((s) => s.isSelected);
-    if (selectedObjects.isNotEmpty) {
+    var selectedObjects = selected.toList();
+    if (selectedObjects.length == 1) {
       var toObjects = <GameObject>[]..addAll(planets)..addAll(jumpGates);
-      for (var selected in selectedObjects) {
-        toObjects.remove(selected);
-        _drawDistances(selected, toObjects, renderCtx);
+      for (var object in selectedObjects) {
+        toObjects.remove(object);
+        _drawDistances(object, toObjects, renderCtx);
+      }
+    } else if (selectedObjects.length > 1) {
+      GameObject a = selectedObjects.removeAt(0);
+      GameObject b;
+      while (selectedObjects.isNotEmpty) {
+        b = selectedObjects.removeAt(0);
+        _drawDistance(a, b, renderCtx);
+        a = b;
       }
     }
   }
 
   void _drawDistances(GameObject from, Iterable<GameObject> toObjects,
       CanvasRenderingContext2D renderCtx) {
-    var fromPoint = from is DockingPoint ? from.dockingPoint : from;
     for (var to in toObjects) {
-      var toPoint = to is DockingPoint ? to.dockingPoint : to;
-      _drawDistance(fromPoint, toPoint, renderCtx);
+      _drawDistance(from, to, renderCtx);
     }
   }
 
-  void _drawDistance(
-      Position from, Position to, CanvasRenderingContext2D renderCtx) {
+  void _drawDistance(GameObject fromObj, GameObject toObj,
+      CanvasRenderingContext2D renderCtx) {
+    var from = fromObj is DockingPoint ? fromObj.dockingPoint : fromObj;
+    var to = toObj is DockingPoint ? toObj.dockingPoint : toObj;
     var oldWidth = renderCtx.lineWidth;
     renderCtx.lineWidth = 4;
     renderCtx.setLineDash([8, 24]);
