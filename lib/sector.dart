@@ -58,8 +58,22 @@ class Sector extends FirebaseObject with GameObject, _$SectorSerializerMixin {
     }
     renderCtx.stroke();
 
-    renderCtx.font = '90px sans-serif';
-    renderCtx.setFillColorRgb(259, 69, 0);
-    renderCtx.fillText(name, x - 45, y + 30);
+    renderCtx.font = '75px sans-serif';
+    if (name.endsWith('1')) {
+      renderCtx.setFillColorRgb(259, 69, 0);
+    } else if (name.endsWith('2')) {
+      renderCtx.setFillColorRgb(244, 164, 66);
+    } else if (name.endsWith('3')) {
+      renderCtx.setFillColorRgb(242, 239, 62);
+    } else if (name.endsWith('4')) {
+      renderCtx.setFillColorRgb(57, 229, 65);
+    } else if (name.endsWith('5')) {
+      renderCtx.setFillColorRgb(61, 127, 219);
+    } else if (name.endsWith('6')) {
+      renderCtx.setFillColorRgb(149, 57, 214);
+    } else if (name.endsWith('7')) {
+      renderCtx.setFillColorRgb(71, 17, 109);
+    }
+    renderCtx.fillText(name, x - 130, y - 150);
   }
 }
