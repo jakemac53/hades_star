@@ -107,8 +107,8 @@ class SimplePosition implements Position {
 bool rectCollide(num x, num y, GameObject object, num scale) {
   x = x / scale;
   y = y / scale;
-  var width = object.width / scale;
-  var height = object.height / scale;
+  var width = object.width;
+  var height = object.height;
   if (x < object.x || x > object.x + width) return false;
   if (y < object.y || y > object.y + height) return false;
   return true;
