@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
+import 'asteroid.dart';
 import 'common.dart';
 import 'jump_gate.dart';
 import 'planet.dart';
@@ -32,6 +33,9 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   bool isLocked = false;
 
   @JsonKey(ignore: true)
+  final List<Asteroid> asteroids;
+
+  @JsonKey(ignore: true)
   final List<Planet> planets;
 
   @JsonKey(ignore: true)
@@ -40,8 +44,16 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   @JsonKey(ignore: true)
   final List<JumpGate> jumpGates;
 
-  Iterable<Selectable> get selectables =>
-      <Selectable>[].followedBy(planets).followedBy(jumpGates);
+  Iterable<Drawable> get drawables => <Drawable>[]
+      .followedBy(sectors)
+      .followedBy(asteroids)
+      .followedBy(planets)
+      .followedBy(jumpGates);
+
+  Iterable<Selectable> get selectables => <Selectable>[]
+      .followedBy(asteroids)
+      .followedBy(planets)
+      .followedBy(jumpGates);
 
   @JsonKey(ignore: true)
   final selected = <Selectable>[];
@@ -53,6 +65,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       @required String firebaseId,
       @required this.name})
       : jumpGates = <JumpGate>[],
+        asteroids = <Asteroid>[],
         planets = <Planet>[],
         sectors = <Sector>[],
         super(firebaseId) {
@@ -75,6 +88,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
 
   Star(
       {List<JumpGate> jumpGates,
+      List<Asteroid> asteroids,
       List<Planet> planets,
       List<Sector> sectors,
       bool isLocked,
@@ -82,7 +96,8 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       @required this.width,
       @required String firebaseId,
       @required this.name})
-      : planets = planets ?? <Planet>[],
+      : asteroids = asteroids ?? <Asteroid>[],
+        planets = planets ?? <Planet>[],
         sectors = sectors ?? <Sector>[],
         jumpGates = jumpGates ?? <JumpGate>[],
         isLocked = isLocked ?? false,
@@ -109,14 +124,8 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
 
   @override
   void draw(CanvasRenderingContext2D renderCtx, GameContext gameCtx) {
-    for (var sector in sectors) {
-      sector.draw(renderCtx, gameCtx);
-    }
-    for (var planet in planets) {
-      planet.draw(renderCtx, gameCtx);
-    }
-    for (var jumpGate in jumpGates) {
-      jumpGate.draw(renderCtx, gameCtx);
+    for (var drawable in drawables) {
+      drawable.draw(renderCtx, gameCtx);
     }
     renderCtx.setStrokeColorRgb(0, 255, 0);
     renderCtx.font = '40px sans-serif';

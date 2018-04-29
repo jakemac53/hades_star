@@ -3,6 +3,7 @@ import 'dart:html';
 
 import 'package:firebase/firebase.dart' as firebase;
 
+import 'package:hades_simulator/asteroid.dart';
 import 'package:hades_simulator/common.dart';
 import 'package:hades_simulator/jump_gate.dart';
 import 'package:hades_simulator/sector.dart';
@@ -47,6 +48,19 @@ main() async {
     var planets = planetsJson.values.map((planetJson) =>
         new Planet.fromJson((planetJson as Map).cast<String, dynamic>()));
     star.planets.addAll(planets);
+  }
+
+  var asteroidsRef = database.ref('/asteroids/$starId');
+  if (asteroidsRef == null) {
+    asteroidsRef = database.ref('asteroidsRef').push(starId);
+    await asteroidsRef.set({});
+  }
+  var asteroidsJson =
+      (await asteroidsRef.once('value')).snapshot.toJson() as Map;
+  if (asteroidsJson != null) {
+    var asteroids = asteroidsJson.values.map((asteroidJson) =>
+        new Asteroid.fromJson((asteroidJson as Map).cast<String, dynamic>()));
+    star.asteroids.addAll(asteroids);
   }
 
   var jumpGatesRef = database.ref('/jump_gates/$starId');
@@ -102,6 +116,15 @@ main() async {
     var planet = new Planet(x: Sector.WIDTH / 2, y: Sector.HEIGHT / 2);
     var ref = planetsRef.child(star.planets.length.toString());
     ref.set(planet.toJson());
+  });
+
+  var newAsteroidButton = document.body.querySelector('#add_asteroid');
+  newAsteroidButton.onClick.listen((_) {
+    if (star.isLocked) return;
+    var ref = asteroidsRef.push();
+    var asteroid = new Asteroid(
+        x: Sector.WIDTH, y: Sector.HEIGHT / 2, firebaseId: ref.key);
+    ref.set(asteroid.toJson());
   });
 
   var newJumpGateButton =
@@ -185,7 +208,7 @@ main() async {
     if (star.isLocked) return;
     e.preventDefault();
     var last = star.selected.last;
-    if (last is Planet) {
+    if (last is Draggable) {
       var modifier = e.shiftKey ? 10 : 1;
       switch (e.keyCode) {
         case KeyCode.UP:
@@ -207,6 +230,26 @@ main() async {
     }
     _drawStar(star, canvas, gameCtx);
   });
+
+  void _onAsteroidUpdate(firebase.QueryEvent event) {
+    var id = event.snapshot.key;
+    var existing = star.asteroids.firstWhere(
+        (asteroid) => asteroid.firebaseId == id,
+        orElse: () => null);
+    var updated = new Asteroid.fromJson(
+        (event.snapshot.toJson() as Map).cast<String, dynamic>());
+    if (existing == null) {
+      star.asteroids.add(updated);
+    } else {
+      existing
+        ..x = updated.x
+        ..y = updated.y;
+    }
+    _drawStar(star, canvas, gameCtx);
+  }
+
+  asteroidsRef.onChildChanged.listen(_onAsteroidUpdate);
+  asteroidsRef.onChildAdded.listen(_onAsteroidUpdate);
 
   void _onPlanetUpdate(firebase.QueryEvent event) {
     var position = int.parse(event.snapshot.key);
@@ -265,6 +308,8 @@ Future _updateObject(
   var star = ctx.star;
   if (object is Planet) {
     await _updatePlanet(object, star, db);
+  } else if (object is Asteroid) {
+    await _updateAsteroid(object, star, db);
   } else {
     throw new UnsupportedError('Tried to update $object but didn\'t know how');
   }
@@ -280,6 +325,12 @@ Future _updateObject(
     // ignore: unawaited_futures
     _updateObject(next, db, ctx);
   }
+}
+
+Future _updateAsteroid(Asteroid asteroid, Star star, firebase.Database db) {
+  var asteroidRef =
+      db.ref('/asteroids/${star.firebaseId}/${asteroid.firebaseId}');
+  return asteroidRef.set(asteroid.toJson());
 }
 
 Future _updatePlanet(Planet planet, Star star, firebase.Database db) {
