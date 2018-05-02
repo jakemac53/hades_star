@@ -2,7 +2,7 @@
 
 <head>
     <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
-    <script defer src="star.dart.js"></script>
+    <script defer src="star.dart.js?q={{digest star.dart.js}}"></script>
 </head>
 
 <body style="width: 100%">

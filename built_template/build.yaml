@@ -1,0 +1,14 @@
+builders:
+  built_template:
+    import: 'package:built_template/builder.dart'
+    builder_factories:
+      - createBuilder
+    build_extensions:
+      '.template':
+        - ''
+    auto_apply: dependents
+    is_optional: false
+    build_to: cache
+    required_inputs:
+      - '.js'
+      - '.css'
