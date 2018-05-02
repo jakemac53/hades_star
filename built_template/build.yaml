@@ -4,8 +4,8 @@ builders:
     builder_factories:
       - createBuilder
     build_extensions:
-      '.template':
-        - ''
+      '.template.html':
+        - '.html'
     auto_apply: dependents
     is_optional: false
     build_to: cache

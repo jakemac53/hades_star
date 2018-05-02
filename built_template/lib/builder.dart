@@ -7,7 +7,7 @@ TemplateBuilder createBuilder(BuilderOptions options) => new TemplateBuilder();
 class TemplateBuilder extends Builder {
   @override
   final buildExtensions = const {
-    '.template': const ['']
+    '.template.html': const ['.html']
   };
 
   @override
@@ -43,7 +43,8 @@ class TemplateBuilder extends Builder {
     output.write(content.substring(lastEnd, content.length));
 
     await buildStep.writeAsString(
-        buildStep.inputId.changeExtension(''), output.toString());
+        buildStep.inputId.changeExtension('').changeExtension('.html'),
+        output.toString());
   }
 }
 

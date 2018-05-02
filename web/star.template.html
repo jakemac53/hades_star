@@ -1,0 +1,33 @@
+<html>
+
+<head>
+    <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
+    <script defer src="star.dart.js?q={{digest star.dart.js}}"></script>
+    <style>
+        #top_bar>* {
+            float: left;
+            display: block;
+        }
+    </style>
+</head>
+
+<body style="width: 100%">
+    <div id="top_bar">
+        <label for="lock_star">Lock Star: </label>
+        <input type="checkbox" id="lock_star" />
+        <button id="add_planet" style="margin-left: 20px">Create Planet</button>
+        <button id="add_asteroid" style="margin-left: 20px">Create Asteroid</button>
+        <button id="add_jg" style="margin-left: 20px">Create JG</button>
+        <label for="jg_sector" style="margin-left: 5px;">sector:</label>
+        <input id="jg_sector" style="margin-left: 5px">
+        <span style="margin-left:20px;" id="saving"></span>
+    </div>
+    <canvas id="game" style="display: block; float: left;clear:left;"></canvas>
+    <div style="display:none;">
+        <img id="jump_gate" src="assets/jump_gate.png" />
+        <img id="planet" src="assets/planet_lvl_10.png" />
+        <img id="asteroid" src="assets/asteroid.png" />
+    </div>
+</body>
+
+</html>

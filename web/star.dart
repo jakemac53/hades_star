@@ -9,6 +9,13 @@ import 'package:hades_simulator/jump_gate.dart';
 import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'star.g.dart';
+
+@JsonLiteral('firebase.json')
+Map<String, String> get firebaseData =>
+    _$firebaseDataJsonLiteral.cast<String, String>();
 
 main() async {
   var starId = window.location.search;
@@ -20,12 +27,12 @@ main() async {
   }
 
   firebase.initializeApp(
-      apiKey: 'AIzaSyDSEG_xCVQrYrDiEbc9LI2zGFuAzhNMLMA',
-      authDomain: 'hades-star-a1bff.firebaseapp.com',
-      databaseURL: 'https://hades-star-a1bff.firebaseio.com',
-      projectId: 'hades-star-a1bff',
-      storageBucket: 'hades-star-a1bff.appspot.com',
-      messagingSenderId: '927697248914');
+      apiKey: firebaseData['apiKey'],
+      authDomain: firebaseData['authDomain'],
+      databaseURL: firebaseData['databaseURL'],
+      projectId: firebaseData['projectId'],
+      storageBucket: firebaseData['storageBucket'],
+      messagingSenderId: firebaseData['messagingSenderId']);
   var database = firebase.database();
   var starRef = database.ref('stars').child(starId);
   var starJson = (await starRef.once('value')).snapshot.toJson() as Map;
