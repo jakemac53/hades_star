@@ -22,6 +22,9 @@ class Planet extends FirebaseObject
   static const SIZE = 60.0;
 
   @override
+  String tableId(String starId) => '/planets/$starId';
+
+  @override
   double x;
   @override
   double y;

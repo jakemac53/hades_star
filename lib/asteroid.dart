@@ -22,6 +22,9 @@ class Asteroid extends FirebaseObject
   static const SIZE = 25.0;
 
   @override
+  String tableId(String starId) => '/asteroids/$starId';
+
+  @override
   double x;
   @override
   double y;

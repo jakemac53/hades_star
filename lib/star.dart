@@ -21,6 +21,9 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   final String name;
 
   @override
+  String tableId(String starId) => '/stars';
+
+  @override
   double x = 0.0;
 
   @override
@@ -133,7 +136,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
             name: '${letters[col]}$row',
             firebaseId: sectorRef.key);
         star.sectors.add(sector);
-        await sectorRef.set(sector.toJson());
+        await sector.updateFirebase(db, star.firebaseId);
       }
     }
 

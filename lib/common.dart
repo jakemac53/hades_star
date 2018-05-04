@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:html';
 import 'dart:math' as math;
 
+import 'package:firebase/firebase.dart' as firebase;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
@@ -85,10 +86,25 @@ abstract class Size {
   double get height;
 }
 
-class FirebaseObject {
+abstract class FirebaseObject {
   final String firebaseId;
 
+  /// Gives the table name for this object based on [starId].
+  String tableId(String starId);
+
   FirebaseObject(this.firebaseId);
+
+  /// Updates an object in the database.
+  ///
+  /// If [starId] is present then the objects are stored at
+  /// `/$tableId/$starId/$firebaseId`, otherwise they are stored at
+  ///  `/$tableId/$firebaseId`.
+  Future<void> updateFirebase(firebase.Database db, String starId) {
+    var ref = db.ref(tableId(starId)).child(firebaseId);
+    return ref.set(toJson());
+  }
+
+  Map<String, dynamic> toJson();
 }
 
 abstract class GameObject implements Position, Size, Drawable {

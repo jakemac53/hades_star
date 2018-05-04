@@ -15,6 +15,9 @@ class Sector extends FirebaseObject with GameObject, _$SectorSerializerMixin {
   static const SIZE = 250.0;
 
   @override
+  String tableId(String starId) => '/sectors/$starId';
+
+  @override
   double x;
 
   @override

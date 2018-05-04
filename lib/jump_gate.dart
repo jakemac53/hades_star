@@ -17,6 +17,9 @@ class JumpGate extends FirebaseObject
   static final SIZE = 50.0;
 
   @override
+  String tableId(String starId) => '/jump_gates/$starId';
+
+  @override
   double x;
 
   @override

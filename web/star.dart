@@ -79,7 +79,7 @@ main() async {
   lockStarBox.onChange.listen((e) {
     if (star.isLocked == lockStarBox.checked) return;
     star.isLocked = lockStarBox.checked;
-    _updateStar(star, database);
+    star.updateFirebase(database, star.firebaseId);
   });
   starRef.child('isLocked').onValue.listen((e) {
     var locked = e.snapshot.toJson() as bool;
@@ -139,9 +139,10 @@ main() async {
       }
       star.selected.clear();
     }
-    var selectedSomething = false;
+    var clickedSomething = false;
     for (var selectable in star.selectables) {
       if (rectCollide(x, y, selectable)) {
+        clickedSomething = true;
         var alreadySelected = star.selected.contains(selectable);
         if (!alreadySelected) {
           star.selected.add(selectable);
@@ -159,9 +160,13 @@ main() async {
           draggable.startDrag(e, canvas, gameCtx).listen((_) {
             wasDragged = true;
             _drawStar(star, canvas, gameCtx);
-            _updateObject(draggable, database, gameCtx);
+            if (draggable is FirebaseObject) {
+              _updateObject(draggable as FirebaseObject, database, gameCtx);
+            }
           }).onDone(() {
-            _updateObject(draggable, database, gameCtx);
+            if (draggable is FirebaseObject) {
+              _updateObject(draggable as FirebaseObject, database, gameCtx);
+            }
             if (alreadySelected && !wasDragged) {
               unselect();
               _drawStar(star, canvas, gameCtx);
@@ -170,11 +175,10 @@ main() async {
         } else if (alreadySelected) {
           unselect();
         }
-        selectedSomething = true;
         break;
       }
     }
-    if (!selectedSomething) {
+    if (!clickedSomething) {
       if (e.ctrlKey) {
         var waypoint = new Waypoint(x: x, y: y, star: star);
         star.waypoints.add(waypoint);
@@ -219,7 +223,9 @@ main() async {
         default:
           return;
       }
-      _updateObject(last, database, gameCtx);
+      if (last is FirebaseObject) {
+        _updateObject(last as FirebaseObject, database, gameCtx);
+      }
     }
     _drawStar(star, canvas, gameCtx);
   });
@@ -298,10 +304,10 @@ void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {
 }
 
 bool _updating = false;
-final _objectsToUpdate = <GameObject>[];
+final _objectsToUpdate = <FirebaseObject>[];
 
 Future _updateObject(
-    GameObject object, firebase.Database db, GameContext ctx) async {
+    FirebaseObject object, firebase.Database db, GameContext ctx) async {
   if (_updating) {
     if (!_objectsToUpdate.contains(object)) {
       _objectsToUpdate.add(object);
@@ -313,13 +319,7 @@ Future _updateObject(
   _updating = true;
 
   var star = ctx.star;
-  if (object is Planet) {
-    await _updatePlanet(object, star, db);
-  } else if (object is Asteroid) {
-    await _updateAsteroid(object, star, db);
-  } else {
-    throw new UnsupportedError('Tried to update $object but didn\'t know how');
-  }
+  await object.updateFirebase(db, star.firebaseId);
 
   savingSpan.text = 'done!';
   await new Future.delayed(new Duration(milliseconds: 250));
@@ -332,20 +332,4 @@ Future _updateObject(
     // ignore: unawaited_futures
     _updateObject(next, db, ctx);
   }
-}
-
-Future _updateAsteroid(Asteroid asteroid, Star star, firebase.Database db) {
-  var asteroidRef =
-      db.ref('/asteroids/${star.firebaseId}/${asteroid.firebaseId}');
-  return asteroidRef.set(asteroid.toJson());
-}
-
-Future _updatePlanet(Planet planet, Star star, firebase.Database db) {
-  var planetRef = db.ref('/planets/${star.firebaseId}/${planet.firebaseId}');
-  return planetRef.set(planet.toJson());
-}
-
-Future _updateStar(Star star, firebase.Database db) {
-  var starRef = db.ref('stars').child(star.firebaseId);
-  return starRef.set(star.toJson());
 }
