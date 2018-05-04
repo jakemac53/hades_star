@@ -5,6 +5,7 @@ import 'package:firebase/firebase.dart' as firebase;
 
 import 'package:hades_simulator/asteroid.dart';
 import 'package:hades_simulator/common.dart';
+import 'package:hades_simulator/info_pane.dart';
 import 'package:hades_simulator/jump_gate.dart';
 import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
@@ -17,6 +18,9 @@ part 'star.g.dart';
 @JsonLiteral('firebase.json')
 Map<String, String> get firebaseData =>
     _$firebaseDataJsonLiteral.cast<String, String>();
+
+final infoPane = new InfoPane(
+    parent: document.body.querySelector('#info_pane') as DivElement);
 
 main() async {
   var starId = window.location.search;
@@ -190,20 +194,9 @@ main() async {
     _drawStar(star, canvas, gameCtx);
   });
 
-  document.onMouseDown.listen((e) {
-    if (e.target != canvas) {
-      for (var object in star.selected) {
-        object.deselect();
-      }
-      star.selected.clear();
-      _drawStar(star, canvas, gameCtx);
-    }
-  });
-
   document.onKeyDown.listen((KeyboardEvent e) {
     if (star.selected.isEmpty) return;
     if (star.isLocked) return;
-    e.preventDefault();
     var last = star.selected.last;
     if (last is Draggable) {
       var modifier = e.shiftKey ? 10 : 1;
@@ -226,8 +219,9 @@ main() async {
       if (last is FirebaseObject) {
         _updateObject(last as FirebaseObject, database, gameCtx);
       }
+      _drawStar(star, canvas, gameCtx);
+      e.preventDefault();
     }
-    _drawStar(star, canvas, gameCtx);
   });
 
   void _onAsteroidUpdate(firebase.QueryEvent event) {
@@ -301,6 +295,7 @@ void _drawStar(Star star, CanvasElement canvas, GameContext gameCtx) {
   renderCtx.fillRect(
       0, 0, canvas.width / gameCtx.scale, canvas.height / gameCtx.scale);
   gameCtx.star.draw(renderCtx, gameCtx);
+  infoPane.renderPathDetails(star.selected);
 }
 
 bool _updating = false;

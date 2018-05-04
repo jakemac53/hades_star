@@ -193,10 +193,9 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
     renderCtx.setLineDash([]);
     renderCtx.lineWidth = oldWidth;
 
+    var distance = computeDistance(from, to);
     var xDiff = from.x - to.x;
     var yDiff = from.y - to.y;
-    var distance =
-        math.sqrt(math.pow(xDiff.abs(), 2) + math.pow(yDiff.abs(), 2)).round();
     renderCtx.fillText('${distance}au', from.x - xDiff / 2, from.y - yDiff / 2);
     renderCtx.lineWidth = oldWidth;
   }

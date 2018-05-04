@@ -121,6 +121,12 @@ class SimplePosition implements Position {
   SimplePosition({@required this.x, @required this.y});
 }
 
+int computeDistance(Position from, Position to) {
+  var xDiff = from.x - to.x;
+  var yDiff = from.y - to.y;
+  return math.sqrt(math.pow(xDiff.abs(), 2) + math.pow(yDiff.abs(), 2)).round();
+}
+
 bool rectCollide(num x, num y, GameObject object) {
   var extraSize = 30;
   var checkWidth = object.width + extraSize;
