@@ -113,7 +113,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
         width: totalWidth,
         firebaseId: starRef.key,
         name: name);
-    await starRef.set(star.toJson());
+    // Wait to actually set the star until all the sectors are created.
 
     const letters = const ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
     var sectorsRef = db.ref('/sectors/${star.firebaseId}');
@@ -136,6 +136,9 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
         await sectorRef.set(sector.toJson());
       }
     }
+
+    // Finally create the star object, its all set up.
+    await starRef.set(star.toJson());
     return star;
   }
 
