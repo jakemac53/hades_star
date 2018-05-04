@@ -9,6 +9,7 @@ import 'package:hades_simulator/jump_gate.dart';
 import 'package:hades_simulator/sector.dart';
 import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
+import 'package:hades_simulator/waypoint.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'star.g.dart';
@@ -129,8 +130,8 @@ main() async {
 
   canvas.onMouseDown.listen((e) {
     e.preventDefault();
-    var x = e.offset.x;
-    var y = e.offset.y;
+    var x = e.offset.x / gameCtx.scale;
+    var y = e.offset.y / gameCtx.scale;
 
     if (!e.ctrlKey) {
       for (var object in star.selected) {
@@ -138,8 +139,9 @@ main() async {
       }
       star.selected.clear();
     }
+    var selectedSomething = false;
     for (var selectable in star.selectables) {
-      if (rectCollide(x, y, selectable, gameCtx.scale)) {
+      if (rectCollide(x, y, selectable)) {
         var alreadySelected = star.selected.contains(selectable);
         if (!alreadySelected) {
           star.selected.add(selectable);
@@ -150,7 +152,8 @@ main() async {
           selectable.deselect();
         }
 
-        if (!star.isLocked && selectable is Draggable) {
+        if ((!star.isLocked || selectable is Waypoint) &&
+            selectable is Draggable) {
           var draggable = selectable as Draggable;
           var wasDragged = false;
           draggable.startDrag(e, canvas, gameCtx).listen((_) {
@@ -167,7 +170,17 @@ main() async {
         } else if (alreadySelected) {
           unselect();
         }
+        selectedSomething = true;
         break;
+      }
+    }
+    if (!selectedSomething) {
+      if (e.ctrlKey) {
+        var waypoint = new Waypoint(x: x, y: y, star: star);
+        star.waypoints.add(waypoint);
+        star.selected.add(waypoint);
+      } else {
+        star.waypoints.clear();
       }
     }
     _drawStar(star, canvas, gameCtx);

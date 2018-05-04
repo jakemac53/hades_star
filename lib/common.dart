@@ -105,9 +105,7 @@ class SimplePosition implements Position {
   SimplePosition({@required this.x, @required this.y});
 }
 
-bool rectCollide(num x, num y, GameObject object, num scale) {
-  x = x / scale;
-  y = y / scale;
+bool rectCollide(num x, num y, GameObject object) {
   var extraSize = 30;
   var checkWidth = object.width + extraSize;
   var checkHeight = object.height + extraSize;

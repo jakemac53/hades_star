@@ -11,6 +11,7 @@ import 'common.dart';
 import 'jump_gate.dart';
 import 'planet.dart';
 import 'sector.dart';
+import 'waypoint.dart';
 
 part 'star.g.dart';
 
@@ -46,16 +47,21 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
   @JsonKey(ignore: true)
   final List<JumpGate> jumpGates;
 
+  @JsonKey(ignore: true)
+  final List<Waypoint> waypoints;
+
   Iterable<Drawable> get drawables => <Drawable>[]
       .followedBy(sectors)
       .followedBy(asteroids)
       .followedBy(planets)
-      .followedBy(jumpGates);
+      .followedBy(jumpGates)
+      .followedBy(waypoints);
 
   Iterable<Selectable> get selectables => <Selectable>[]
       .followedBy(asteroids)
       .followedBy(planets)
-      .followedBy(jumpGates);
+      .followedBy(jumpGates)
+      .followedBy(waypoints);
 
   @JsonKey(ignore: true)
   final selected = <Selectable>[];
@@ -69,6 +75,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
         asteroids = <Asteroid>[],
         planets = <Planet>[],
         sectors = <Sector>[],
+        waypoints = <Waypoint>[],
         isLocked = false,
         super(firebaseId);
 
@@ -85,6 +92,7 @@ class Star extends FirebaseObject with GameObject, _$StarSerializerMixin {
       : asteroids = asteroids ?? <Asteroid>[],
         planets = planets ?? <Planet>[],
         sectors = sectors ?? <Sector>[],
+        waypoints = <Waypoint>[],
         jumpGates = jumpGates ?? <JumpGate>[],
         isLocked = isLocked ?? false,
         super(firebaseId);
