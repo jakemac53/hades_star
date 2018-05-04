@@ -2,11 +2,22 @@
 
 <head>
     <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
-    <script defer src="star.dart.js?q=92eea551f1d0c3b24701991ae18478fe"></script>
+    <script defer src="star.dart.js?q=f1663aa74bc8dd2bf6f0e62f9c5a4a9d"></script>
     <style>
         #top_bar>* {
             float: left;
             display: block;
+        }
+
+        #info_pane {
+            display: block;
+            float: left;
+            margin-left: 20px;
+        }
+
+        #info_pane td {
+            padding-right: 10px;
+            width: 20%;
         }
     </style>
 </head>
@@ -23,6 +34,7 @@
         <span style="margin-left:20px;" id="saving"></span>
     </div>
     <canvas id="game" style="display: block; float: left;clear:left;"></canvas>
+    <div id="info_pane"></div>
     <div style="display:none;">
         <img id="jump_gate" src="assets/jump_gate.png" />
         <img id="planet" src="assets/planet_lvl_10.png" />
