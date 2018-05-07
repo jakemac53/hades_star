@@ -1,10 +1,10 @@
-# Star creator for Hades Star
+# Star creator and Discord Bot for Hades Star
+
+## Star Creator
 
 A simple app which allows you to create stars and check distances between objects.
 
 Information is stored in Firebase.
-
-## Developing
 
 ### Install the Dart SDK
 
@@ -38,3 +38,15 @@ and commit it to the local `gh-pages` branch.
 Next, you just need to push your local `gh-pages` branch to the remote
 `gh-pages` branch and it will be live in a few minutes! (you can do this
 with `git push origin gh-pages`).
+
+## Discord Bot
+
+A discord bot for Hades Star.
+
+Launch it by running `dart bin/main.dart` from the root of the package.
+
+### Authorization Link
+
+To add the bot to a server, go to the following link:
+
+https://discordapp.com/oauth2/authorize?&client_id=442841166149451786&scope=bot&permissions=0
