@@ -3,14 +3,7 @@ import 'dart:html';
 
 import 'package:firebase/firebase.dart' as firebase;
 
-import 'package:hades_simulator/asteroid.dart';
-import 'package:hades_simulator/common.dart';
-import 'package:hades_simulator/info_pane.dart';
-import 'package:hades_simulator/jump_gate.dart';
-import 'package:hades_simulator/sector.dart';
-import 'package:hades_simulator/planet.dart';
 import 'package:hades_simulator/star.dart';
-import 'package:hades_simulator/waypoint.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'star.g.dart';

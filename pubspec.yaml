@@ -4,6 +4,7 @@ dependencies:
   json_annotation: any
   meta: any
 dev_dependencies:
+  args: any
   build_runner: any
   build_web_compilers: any
   dartsicord: ^0.1.1
