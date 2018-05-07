@@ -21,36 +21,53 @@ main() async {
     var args = event.message.content.split(whiteSpaceRegex);
     var command = args[0];
     args.removeAt(0);
+    Message message;
 
-    var queue = queues[command];
-    if (queue != null) {
-      await handleRsCommand(args, event, queue);
+    if (command == '!help') {
+      message = await help(event);
+    } else if (command == '!cleanup') {
+      await cleanup(event, args);
+    } else {
+      var queue = queues[command];
+      if (queue != null) {
+        message = await queue.handleCommand(args, event);
+      }
+    }
+
+    if (message != null) {
+      new Future.delayed(new Duration(seconds: 10), () {
+        return message.delete();
+      });
     }
   });
 
   await client.connect(new File('bin/client_token.txt').readAsStringSync());
 }
 
-Future handleRsCommand(
-    List<String> args, MessageCreateEvent event, StarQueue queue) async {
-  var command = args[0];
-  args.removeAt(0);
-  switch (command) {
-    case 'clear':
-      queue.clear(event);
-      break;
-    case 'in':
-      queue.signup(event);
-      break;
-    case 'out':
-      queue.signout(event);
-      break;
-    case 'list':
-      queue.list(event);
-      break;
-    default:
-      await event.message
-          .reply('Unrecognized subcommand for !${queue.name} $command $args');
-      break;
+Future<void> cleanup(MessageCreateEvent event, List<String> args) async {
+  var deleteCount = args.isEmpty ? 10 : int.tryParse(args.first) ?? 10;
+  var channel = event.message.channel;
+  var messages = await channel.getMessages(
+      limit: deleteCount,
+      base: event.message,
+      downloadType: MessageDownloadType.before);
+  await channel.bulkDeleteMessages(messages);
+}
+
+Future<Message> help(MessageCreateEvent event) {
+  var message = new StringBuffer();
+  message.writeln('To use a queue, type <queue-name> <command-name>');
+  message.writeln();
+  message.writeln('The available queues are the following:');
+  message.writeln();
+  for (var name in queues.keys) {
+    message.writeln('  $name');
   }
+  message.writeln();
+  message.writeln('The available commands are:');
+  message.writeln();
+  for (var command in ['in', 'out', 'ready', 'ping-afk', 'clear', 'list']) {
+    message.writeln('  $command');
+  }
+  return event.message.reply(message.toString());
 }
