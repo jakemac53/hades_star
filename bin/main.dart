@@ -25,7 +25,7 @@ main() async {
     Message message;
 
     if (command == '!help') {
-      message = await help(event);
+      message = await help(event, queues.keys);
       new Future.delayed(new Duration(seconds: 60), () async {
         await message.delete();
       });
@@ -48,32 +48,4 @@ main() async {
   });
 
   await client.connect(new File('bin/client_token.txt').readAsStringSync());
-}
-
-Future<void> tidy(MessageCreateEvent event, List<String> args) async {
-  var deleteCount = args.isEmpty ? 10 : int.tryParse(args.first) ?? 10;
-  var channel = event.message.channel;
-  var messages = await channel.getMessages(
-      limit: deleteCount,
-      base: event.message,
-      downloadType: MessageDownloadType.before);
-  await channel.bulkDeleteMessages(messages.toList()..add(event.message));
-}
-
-Future<Message> help(MessageCreateEvent event) {
-  var message = new StringBuffer();
-  message.writeln('To use a queue, type <queue-name> <command-name>');
-  message.writeln();
-  message.writeln('The available queues are the following:');
-  message.writeln();
-  for (var name in queues.keys) {
-    message.writeln('  $name');
-  }
-  message.writeln();
-  message.writeln('The available commands are:');
-  message.writeln();
-  for (var command in ['in', 'out', 'ready', 'ping-afk', 'tidy', 'list']) {
-    message.writeln('  $command');
-  }
-  return event.message.reply(message.toString());
 }
