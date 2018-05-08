@@ -72,7 +72,7 @@ Future<Message> help(MessageCreateEvent event) {
   message.writeln();
   message.writeln('The available commands are:');
   message.writeln();
-  for (var command in ['in', 'out', 'ready', 'ping-afk', 'clear', 'list']) {
+  for (var command in ['in', 'out', 'ready', 'ping-afk', 'tidy', 'list']) {
     message.writeln('  $command');
   }
   return event.message.reply(message.toString());
