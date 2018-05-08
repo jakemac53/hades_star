@@ -43,8 +43,6 @@ main() async {
         });
       }
     }
-
-    if (message != null) {}
   });
 
   await client.connect(new File('bin/client_token.txt').readAsStringSync());
