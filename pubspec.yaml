@@ -11,3 +11,6 @@ dev_dependencies:
   json_serializable: any
   built_template:
     path: ./built_template
+dependency_overrides:
+  dartsicord:
+    git: https://github.com/voximity/dartsicord.git
