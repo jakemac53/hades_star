@@ -40,9 +40,16 @@ abstract class StarQueue {
 
   Future<Message> handleCommand(
       List<String> args, MessageCreateEvent event) async {
-    var command = args[0];
-    args.removeAt(0);
     Message message;
+    // Amount of time before the response should be removed.
+    var timeout = new Duration(seconds: 30);
+
+    String command;
+    if (args.isEmpty) {
+      command = 'list';
+    } else {
+      command = args.removeAt(0);
+    }
     switch (command) {
       case 'clear':
         message = await clear(event);
@@ -56,6 +63,7 @@ abstract class StarQueue {
       case 'l':
       case 'list':
         message = await list(event);
+        timeout = new Duration(seconds: 180);
         break;
       case 'ping-afk':
         message = await pingAfk(event);
@@ -71,8 +79,10 @@ abstract class StarQueue {
     }
 
     try {
-      await event.message.delete();
+      new Future.delayed(new Duration(seconds: 5), event.message.delete);
     } catch (_) {}
+
+    new Future.delayed(timeout, message.delete);
 
     return message;
   }
@@ -86,7 +96,7 @@ abstract class StarQueue {
     var message = new StringBuffer(
         'There are ${signups.length}/$maxPlayers players in the $name queue:');
     for (var signup in signups) {
-      var ready = signup.ready ? ':white_check_mark: ' : '';
+      var ready = signup.ready ? ':white_check_mark: ' : ':clock1:';
       message.write('\n  - $ready${signup.user.username}');
     }
     return event.message.reply(message.toString());
@@ -164,7 +174,8 @@ abstract class StarQueue {
         var by = event.author.id.id == toRemove.id.id
             ? ''
             : ' by ${event.author.mention}';
-        message.writeln('${toRemove.mention} was removed from the queue$by.');
+        message
+            .writeln(':x: ${toRemove.mention} was removed from the queue$by.');
       }
     }
     message.writeln('There are now ${signups.length} users in the queue.');

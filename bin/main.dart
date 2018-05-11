@@ -22,25 +22,15 @@ main() async {
     var args = event.message.content.split(whiteSpaceRegex);
     var command = args[0];
     args.removeAt(0);
-    Message message;
 
     if (command == '!help') {
-      message = await help(event, queues.keys);
-      new Future.delayed(new Duration(seconds: 60), () async {
-        await message.delete();
-      });
-      try {
-        await event.message.delete();
-      } catch (_) {}
+      await help(event, queues.keys);
     } else if (command == '!tidy') {
       await tidy(event, args);
     } else {
       var queue = queues[command];
       if (queue != null) {
-        message = await queue.handleCommand(args, event);
-        new Future.delayed(new Duration(seconds: 15), () async {
-          await message.delete();
-        });
+        await queue.handleCommand(args, event);
       }
     }
   });

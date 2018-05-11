@@ -9,5 +9,11 @@ Future<void> tidy(MessageCreateEvent event, List<String> args) async {
       limit: deleteCount,
       base: event.message,
       downloadType: MessageDownloadType.before);
-  await channel.bulkDeleteMessages(messages.toList()..add(event.message));
+  try {
+    await channel.bulkDeleteMessages(messages.toList());
+    new Future.delayed(new Duration(seconds: 2), event.message.delete);
+  } catch (_) {
+    await event.message
+        .reply('Unable to delete messages, please check permissions.');
+  }
 }
