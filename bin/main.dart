@@ -15,6 +15,27 @@ final queues = <String, StarQueue>{
 };
 
 main() async {
+  Completer<Null> done;
+  while (true) {
+    print('Connecting: ${new DateTime.now()}');
+    done = new Completer();
+    DiscordClient client;
+    client = await runZoned(run, onError: (e) async {
+      if (e is! WebSocketException) return;
+      try {
+        await client?.disconnect();
+      } catch (_) {}
+      print('Disconnected: ${new DateTime.now()}');
+      await new Future.delayed(new Duration(seconds: 15));
+      done.complete();
+    });
+    print('Connected: ${new DateTime.now()}');
+    // block until we get errors, then restart the client;
+    await done.future;
+  }
+}
+
+Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   client.onMessage.listen((event) async {
@@ -36,4 +57,5 @@ main() async {
   });
 
   await client.connect(new File('bin/client_token.txt').readAsStringSync());
+  return client;
 }
