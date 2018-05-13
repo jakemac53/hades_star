@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dartsicord/dartsicord.dart';
+import 'package:firebase/firebase_io.dart' as firebase;
 import 'package:hades_simulator/discord.dart';
 
 final queues = <String, StarQueue>{
@@ -19,11 +20,15 @@ main() async {
   while (true) {
     print('Connecting: ${new DateTime.now()}');
     done = new Completer();
-    DiscordClient client;
-    client = await runZoned(run, onError: (e) async {
-      if (e is! WebSocketException) return;
+    DiscordClient discordClient;
+
+    discordClient = await runZoned(run, onError: (e) async {
+      if (e is! WebSocketException) {
+        print(e);
+        return;
+      }
       try {
-        await client?.disconnect();
+        await discordClient?.disconnect();
       } catch (_) {}
       print('Disconnected: ${new DateTime.now()}');
       await new Future.delayed(new Duration(seconds: 15));
@@ -38,6 +43,8 @@ main() async {
 Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
+  final firebaseClient = new firebase.FirebaseClient.anonymous();
+  final bank = new Bank(firebaseClient);
   client.onMessage.listen((event) async {
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);
@@ -48,11 +55,11 @@ Future<DiscordClient> run() async {
       await help(event, queues.keys);
     } else if (command == '!tidy') {
       await tidy(event, args);
-    } else {
+    } else if (queues.containsKey(command)) {
       var queue = queues[command];
-      if (queue != null) {
-        await queue.handleCommand(args, event);
-      }
+      await queue.handleCommand(args, event);
+    } else if (Bank.commands.contains(command)) {
+      await bank.handleCommand(command, args, event);
     }
   });
 
