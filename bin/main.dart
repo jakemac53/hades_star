@@ -5,15 +5,7 @@ import 'package:dartsicord/dartsicord.dart';
 import 'package:firebase/firebase_io.dart' as firebase;
 import 'package:hades_simulator/discord.dart';
 
-final queues = <String, StarQueue>{
-  '!wey-rs5': new RedStarQueue('wey-rs5'),
-  '!wey-rs6': new RedStarQueue('wey-rs6'),
-  '!wey-rs7': new RedStarQueue('wey-rs7'),
-  '!wey-ws': new WhiteStarQueue('wey-ws'),
-  '!lotus-rs5': new RedStarQueue('lotus-rs5'),
-  '!lotus-rs6': new RedStarQueue('lotus-rs6'),
-  '!lotus-ws': new WhiteStarQueue('lotus-ws'),
-};
+final queuesByChannel = <String, StarQueue>{};
 
 main() async {
   Completer<Null> done;
@@ -22,9 +14,9 @@ main() async {
     done = new Completer();
     DiscordClient discordClient;
 
-    discordClient = await runZoned(run, onError: (e) async {
+    discordClient = await runZoned(run, onError: (e, s) async {
       if (e is! WebSocketException) {
-        print(e);
+        print('Uncaught Exception: $e\n$s');
         return;
       }
       try {

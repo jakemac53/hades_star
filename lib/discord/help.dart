@@ -2,24 +2,39 @@ import 'dart:async';
 
 import 'package:dartsicord/dartsicord.dart';
 
-Future<Message> help(
-    MessageCreateEvent event, Iterable<String> queueNames) async {
+Future<Message> help(MessageCreateEvent event) async {
   var message = new StringBuffer();
-  message.writeln('There is one top level command, `!tidy`.');
-  message.writeln();
-  message.writeln('To use a queue, type <queue-name> <command-name>');
-  message.writeln();
-  message.writeln('The available queues are the following:');
-  message.writeln();
-  for (var name in queueNames) {
-    message.writeln('  $name');
-  }
-  message.writeln();
-  message.writeln('The available commands are:');
-  message.writeln();
-  for (var command in ['in', 'out', 'ready', 'ping-afk', 'clear', 'list']) {
-    message.writeln('  $command');
-  }
+  message
+    ..writeln('**GENERAL COMMANDS**')
+    ..writeln()
+    ..writeln('`!tidy <num-lines>`')
+    ..writeln()
+    ..writeln('  - Deletes <num-lines> from this channel.')
+    ..writeln()
+    ..writeln('**BANKING COMMANDS**')
+    ..writeln()
+    ..writeln('`!new_account`')
+    ..writeln()
+    ..writeln('  - Creates a new account in the bank for yourself.')
+    ..writeln()
+    ..writeln('`!transfer <amount> @user`')
+    ..writeln()
+    ..writeln('  - Transfers <amount> from your account to @user. '
+        'Both users must have an account.')
+    ..writeln()
+    ..writeln('`!price <artifact-level> <amount>`')
+    ..writeln()
+    ..writeln(
+        '  - Recommends a price for <amount> rs<artifact-level> artifacts.')
+    ..writeln(
+        '    Prices are based on rs1 arts being worth one coin, with a 150% '
+        'profit margin for each tier upgrade.')
+    ..writeln()
+    ..writeln('`!price_chart`')
+    ..writeln()
+    ..writeln('  - Lists all the recommended prices.')
+    ..writeln()
+    ..writeln('**QUEUE COMMANDS**');
 
   var response = await event.message.reply(message.toString());
 
