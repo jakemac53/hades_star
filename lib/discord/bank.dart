@@ -45,10 +45,12 @@ class Bank {
 
   final firebase.FirebaseClient _client;
 
-  final _rootDbUri =
-      'https://firestore.googleapis.com/v1beta1/projects/hades-star-a1bff/databases/(default)/documents';
+  final String firebaseProject;
 
-  Bank(this._client);
+  String get _rootDbUri =>
+      'https://firestore.googleapis.com/v1beta1/projects/$firebaseProject/databases/(default)/documents';
+
+  Bank(this._client, this.firebaseProject);
 
   Future<Null> handleCommand(
       String command, List<String> args, MessageCreateEvent event) async {
@@ -121,6 +123,26 @@ class Bank {
         await event.message.reply(message.toString());
         break;
     }
+  }
+
+  Future help(MessageCreateEvent event) async {
+    var message = '''
+The commands are the following:
+
+- `!new_account`: Creates a new account for yourself. 
+- `!balance`: Lists your balance.
+- `!transfer @person <amount>`: transfer credits to another person
+''';
+
+    var response = await event.message.reply(message);
+
+    try {
+      new Future.delayed(new Duration(seconds: 5), event.message.delete);
+    } catch (_) {}
+    var timeout = new Duration(seconds: 300);
+    new Future.delayed(timeout, response.delete);
+
+    return response;
   }
 }
 

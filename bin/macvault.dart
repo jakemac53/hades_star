@@ -5,8 +5,6 @@ import 'package:dartsicord/dartsicord.dart';
 import 'package:firebase/firebase_io.dart' as firebase;
 import 'package:hades_simulator/discord.dart';
 
-final queuesByChannel = <String, StarQueue>{};
-
 main() async {
   Completer<Null> done;
   while (true) {
@@ -14,9 +12,9 @@ main() async {
     done = new Completer();
     DiscordClient discordClient;
 
-    discordClient = await runZoned(run, onError: (e, s) async {
+    discordClient = await runZoned(run, onError: (e) async {
       if (e is! WebSocketException) {
-        print('Uncaught Exception: $e\n$s');
+        print(e);
         return;
       }
       try {
@@ -36,7 +34,7 @@ Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, 'hades-star-a1bff');
+  final bank = new Bank(firebaseClient, 'macvault-5e930');
   client.onMessage.listen((event) async {
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);
@@ -44,17 +42,15 @@ Future<DiscordClient> run() async {
     args.removeAt(0);
 
     if (command == '!help') {
-      await help(event, queues.keys);
+      await bank.help(event);
     } else if (command == '!tidy') {
       await tidy(event, args);
-    } else if (queues.containsKey(command)) {
-      var queue = queues[command];
-      await queue.handleCommand(args, event);
     } else if (Bank.commands.contains(command)) {
       await bank.handleCommand(command, args, event);
     }
   });
 
-  await client.connect(new File('bin/client_token.txt').readAsStringSync());
+  await client.connect(
+      new File('bin/macvault_client_token.txt').readAsLinesSync().first);
   return client;
 }
