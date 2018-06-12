@@ -81,7 +81,7 @@ class Bank {
                 .reply('No account found for ${event.author.mention}');
           } else {
             await event.message.reply(
-                '${user.mention} your balance is ${account.balance} Weybucks');
+                '${user.mention} your balance is ${account.balance} MacBucks');
           }
         }
         if (event.message.mentions.isNotEmpty) {
@@ -119,7 +119,7 @@ class Bank {
         }
         var price = amount * artifactCoinValues[lvl - 1];
         await event.message.reply(
-            'I recommend a price of ${price.toStringAsFixed(2)} Weybucks '
+            'I recommend a price of ${price.toStringAsFixed(2)} MacBucks '
             'for $amount rs$lvl artifacts');
         break;
       case '!price_chart':
@@ -127,7 +127,7 @@ class Bank {
         message.writeln();
         for (var i = 0; i < artifactCoinValues.length; i++) {
           var price = artifactCoinValues[i].toStringAsFixed(2);
-          message.writeln('**rs${i + 1}**: $price Weybucks');
+          message.writeln('**rs${i + 1}**: $price MacBucks');
         }
         await event.message.reply(message.toString());
         break;
@@ -182,10 +182,26 @@ class Teller {
         response = await listRequests(event);
         break;
       case 'request':
-        response = await newRequest(event);
+        var message = new StringBuffer();
+        if (event.message.mentions.isNotEmpty) {
+          for (var user in event.message.mentions) {
+            message.writeln(await newRequest(user));
+          }
+        } else {
+          message.writeln(await newRequest(event.message.author));
+        }
+        response = await event.message.reply(message.toString());
         break;
       case 'cancel':
-        response = await cancel(event);
+        var message = new StringBuffer();
+        if (event.message.mentions.isNotEmpty) {
+          for (var user in event.message.mentions) {
+            message.writeln(await cancel(user));
+          }
+        } else {
+          message.writeln(await cancel(event.message.author));
+        }
+        response = await event.message.reply(message.toString());
         break;
       case 'help':
         await help(event);
@@ -213,29 +229,24 @@ class Teller {
     return event.message.reply(message.toString());
   }
 
-  Future<Message> newRequest(MessageCreateEvent event) async {
-    var existing =
-        await TellerRequest.get(_client, _rootDbUri, event.author.id.id);
+  Future<String> newRequest(User user) async {
+    var existing = await TellerRequest.get(_client, _rootDbUri, user.id.id);
     if (existing != null) {
-      return await event.message
-          .reply('You already have an outstanding teller request!');
+      return '${user.mention} already has an outstanding teller request!';
     } else {
-      await TellerRequest.create(event, event.author, _client, _rootDbUri);
-      return await event.message
-          .reply('Request created for ${event.author.mention}!');
+      await TellerRequest.create(user, _client, _rootDbUri);
+      return 'Request created for ${user.mention}!';
     }
   }
 
-  Future<Message> cancel(MessageCreateEvent event) async {
-    var existing =
-        await TellerRequest.get(_client, _rootDbUri, event.author.id.id);
+  Future<String> cancel(User user) async {
+    var existing = await TellerRequest.get(_client, _rootDbUri, user.id.id);
 
     if (existing == null) {
-      return await event.message.reply('You have no pending teller request!');
+      return 'You have no pending teller request!';
     } else {
-      await TellerRequest.delete(_client, _rootDbUri, event.author.id.id);
-      return await event.message
-          .reply('Request cancelled for ${event.author.mention}!');
+      await TellerRequest.delete(_client, _rootDbUri, user.id.id);
+      return 'Request cancelled for ${user.mention}!';
     }
   }
 
@@ -280,8 +291,8 @@ class TellerRequest extends Object with _$TellerRequestSerializerMixin {
   static Uri _firebaseDbUri(String rootDbUri, {String subPath}) =>
       Uri.parse('$rootDbUri$_firebaseDbTable${subPath != null ? subPath : ''}');
 
-  static Future<TellerRequest> create(MessageCreateEvent event, User forUser,
-      firebase.FirebaseClient client, String rootDbUri) async {
+  static Future<TellerRequest> create(
+      User forUser, firebase.FirebaseClient client, String rootDbUri) async {
     var username = forUser.username;
     var userId = forUser.id.id;
     var request = new TellerRequest(username: username);
@@ -324,7 +335,7 @@ class TellerRequest extends Object with _$TellerRequestSerializerMixin {
       result = await client.get(uri);
     } on NotFoundException catch (_) {
       return null;
-    } on firebase.FirebaseClientException catch (e) {
+    } on firebase.FirebaseClientException catch (_) {
       return null;
     }
     var request = new TellerRequest(
@@ -340,7 +351,7 @@ class TellerRequest extends Object with _$TellerRequestSerializerMixin {
       await client.delete(uri);
     } on NotFoundException catch (_) {
       return null;
-    } on firebase.FirebaseClientException catch (e) {
+    } on firebase.FirebaseClientException catch (_) {
       return null;
     }
   }
@@ -373,6 +384,14 @@ class Account extends Object with _$AccountSerializerMixin {
       String rootDbUri,
       num newAccountCredit) async {
     var userId = forUser.id.id;
+
+    var existing = await Account.get(client, rootDbUri, userId);
+    if (existing != null) {
+      await event.message
+          .reply('Account already exists for ${forUser.mention}');
+      return null;
+    }
+
     var account = new Account(balance: newAccountCredit);
     var uri = _firebaseDbUri(rootDbUri)
         .replace(queryParameters: {'documentId': '$userId'});
@@ -383,7 +402,7 @@ class Account extends Object with _$AccountSerializerMixin {
     });
     _firebaseIdExpando[account] = '$userId';
     await event.message.reply('New account created for ${forUser.mention}, '
-        'seeded with ${account.balance} Weybucks');
+        'seeded with ${account.balance} MacBucks');
     return account;
   }
 
@@ -395,7 +414,7 @@ class Account extends Object with _$AccountSerializerMixin {
       result = await client.get(uri);
     } on NotFoundException catch (_) {
       return null;
-    } on firebase.FirebaseClientException catch (e) {
+    } on firebase.FirebaseClientException catch (_) {
       return null;
     }
     var account = new Account(
@@ -494,7 +513,7 @@ class Transaction extends Object with _$TransactionSerializerMixin {
     }
 
     await event.message.reply(
-        'Transferring $amount Weybucks from ${from.mention} to ${to.mention}...');
+        'Transferring $amount MacBucks from ${from.mention} to ${to.mention}...');
     var transaction = new Transaction(
         from: from.id.id,
         to: to.id.id,
@@ -509,8 +528,8 @@ class Transaction extends Object with _$TransactionSerializerMixin {
     await toAccount.changeBalance(amount, client, rootDbUri);
     await fromAccount.changeBalance(-amount, client, rootDbUri);
     await event.message.reply('Transaction successful!\n'
-        '${from.mention}\'s balance: ${fromAccount.balance} Weybucks\n'
-        '${to.mention}\'s balance: ${toAccount.balance} Weybucks');
+        '${from.mention}\'s balance: ${fromAccount.balance} MacBucks\n'
+        '${to.mention}\'s balance: ${toAccount.balance} MacBucks');
     return transaction;
   }
 }
