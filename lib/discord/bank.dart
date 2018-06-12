@@ -18,20 +18,6 @@ final artifactSalvageValues = [
   2400,
 ];
 
-final profitRatio = 1.5;
-
-final List<num> artifactCoinValues = () {
-  var values = <num>[1];
-  for (var i = 1; i < artifactSalvageValues.length; i++) {
-    var salvageValue = artifactSalvageValues[i];
-    var prevSalvageValue = artifactSalvageValues[i - 1];
-    var prevCoinValue = values[i - 1];
-    var rate = salvageValue * profitRatio / prevSalvageValue;
-    values.add(prevCoinValue * rate);
-  }
-  return values;
-}();
-
 final _firebaseIdExpando = new Expando<String>();
 
 class Bank {
@@ -40,17 +26,38 @@ class Bank {
     '!balance',
     '!transfer',
     '!price',
-    '!price_chart'
+    '!price_chart',
+    '!teller'
   ];
+
+  final num profitRatio;
+
+  List<num> get artifactCoinValues {
+    var values = <num>[1];
+    for (var i = 1; i < artifactSalvageValues.length; i++) {
+      var salvageValue = artifactSalvageValues[i];
+      var prevSalvageValue = artifactSalvageValues[i - 1];
+      var prevCoinValue = values[i - 1];
+      var rate = salvageValue * profitRatio / prevSalvageValue;
+      values.add(prevCoinValue * rate);
+    }
+    return values;
+  }
 
   final firebase.FirebaseClient _client;
 
   final String firebaseProject;
 
+  final num newAccountCredit;
+
+  final Teller teller;
+
   String get _rootDbUri =>
       'https://firestore.googleapis.com/v1beta1/projects/$firebaseProject/databases/(default)/documents';
 
-  Bank(this._client, this.firebaseProject);
+  Bank(this._client, this.firebaseProject, this.profitRatio,
+      this.newAccountCredit)
+      : teller = new Teller(_client, firebaseProject);
 
   Future<Null> handleCommand(
       String command, List<String> args, MessageCreateEvent event) async {
@@ -58,11 +65,12 @@ class Bank {
       case '!new_account':
         if (event.message.mentions.isNotEmpty) {
           for (var newUser in event.message.mentions) {
-            await Account.create(event, newUser, _client, _rootDbUri);
+            await Account.create(
+                event, newUser, _client, _rootDbUri, newAccountCredit);
           }
         } else {
-          await Account.create(
-              event, event.message.author, _client, _rootDbUri);
+          await Account.create(event, event.message.author, _client, _rootDbUri,
+              newAccountCredit);
         }
         break;
       case '!balance':
@@ -93,7 +101,8 @@ class Bank {
               'Expected one or two arguments, the lvl of artifact and the amount');
           return;
         }
-        var lvl = int.tryParse(args.first);
+        var lvl = int.tryParse(
+            args.first.startsWith('rs') ? args.first.substring(2) : args.first);
         if (lvl == null) {
           await event.message.reply(
               'Expected a number (artifact level) but got ${args.first}');
@@ -122,6 +131,9 @@ class Bank {
         }
         await event.message.reply(message.toString());
         break;
+      case '!teller':
+        await teller.handleCommand(args.first, args.skip(1).toList(), event);
+        break;
     }
   }
 
@@ -131,7 +143,12 @@ The commands are the following:
 
 - `!new_account`: Creates a new account for yourself. 
 - `!balance`: Lists your balance.
-- `!transfer @person <amount>`: transfer credits to another person
+- `!transfer @person <amount>`: transfer credits to another person.
+- `!price <rs-level> <amount>`: Lists a recommended price for some artifacts. 
+- `!price_chart`: Lists the full recommended price chart.
+
+Many of these commands default to the current user, but you can
+@mention somebody to make it operate on that user instead. 
 ''';
 
     var response = await event.message.reply(message);
@@ -143,6 +160,189 @@ The commands are the following:
     new Future.delayed(timeout, response.delete);
 
     return response;
+  }
+}
+
+class Teller {
+  List<String> commands = ['list', 'request', 'cancel', 'help'];
+
+  final firebase.FirebaseClient _client;
+  final String firebaseProject;
+
+  String get _rootDbUri =>
+      'https://firestore.googleapis.com/v1beta1/projects/$firebaseProject/databases/(default)/documents';
+
+  Teller(this._client, this.firebaseProject);
+
+  Future<Null> handleCommand(
+      String command, List<String> args, MessageCreateEvent event) async {
+    Message response;
+    switch (command) {
+      case 'list':
+        response = await listRequests(event);
+        break;
+      case 'request':
+        response = await newRequest(event);
+        break;
+      case 'cancel':
+        response = await cancel(event);
+        break;
+      case 'help':
+        await help(event);
+        return;
+        break;
+    }
+
+    if (response != null) {
+      try {
+        new Future.delayed(new Duration(seconds: 5), event.message.delete);
+      } catch (_) {}
+      var timeout = new Duration(seconds: 300);
+      new Future.delayed(timeout, response.delete);
+    }
+  }
+
+  Future<Message> listRequests(MessageCreateEvent event) async {
+    var requests = await TellerRequest.list(_client, _rootDbUri);
+    var message =
+        new StringBuffer('There are ${requests.length} pending requests:');
+    message.writeln('');
+    for (var request in requests) {
+      message.writeln('- ${request.username}');
+    }
+    return event.message.reply(message.toString());
+  }
+
+  Future<Message> newRequest(MessageCreateEvent event) async {
+    var existing =
+        await TellerRequest.get(_client, _rootDbUri, event.author.id.id);
+    if (existing != null) {
+      return await event.message
+          .reply('You already have an outstanding teller request!');
+    } else {
+      await TellerRequest.create(event, event.author, _client, _rootDbUri);
+      return await event.message
+          .reply('Request created for ${event.author.mention}!');
+    }
+  }
+
+  Future<Message> cancel(MessageCreateEvent event) async {
+    var existing =
+        await TellerRequest.get(_client, _rootDbUri, event.author.id.id);
+
+    if (existing == null) {
+      return await event.message.reply('You have no pending teller request!');
+    } else {
+      await TellerRequest.delete(_client, _rootDbUri, event.author.id.id);
+      return await event.message
+          .reply('Request cancelled for ${event.author.mention}!');
+    }
+  }
+
+  Future help(MessageCreateEvent event) async {
+    var message = '''
+The teller commands are the following:
+
+- `request`: Creates a request for a teller for yourself. 
+- `cancel`: Cancels any existing requests you have.
+- `list`: Lists all pending teller requests.
+''';
+
+    var response = await event.message.reply(message);
+
+    try {
+      new Future.delayed(new Duration(seconds: 5), event.message.delete);
+    } catch (_) {}
+    var timeout = new Duration(seconds: 300);
+    new Future.delayed(timeout, response.delete);
+
+    return response;
+  }
+}
+
+@JsonSerializable()
+class TellerRequest extends Object with _$TellerRequestSerializerMixin {
+  @override
+  String username;
+
+  String get firebaseId => _firebaseIdExpando[this];
+
+  TellerRequest({@required this.username});
+
+  factory TellerRequest.fromJson(Map<String, dynamic> data, String id) {
+    var request = _$TellerRequestFromJson(data);
+    _firebaseIdExpando[request] = '$id';
+    return request;
+  }
+
+  // Path the to table containing the accounts by id.
+  static String get _firebaseDbTable => '/teller_requests';
+  static Uri _firebaseDbUri(String rootDbUri, {String subPath}) =>
+      Uri.parse('$rootDbUri$_firebaseDbTable${subPath != null ? subPath : ''}');
+
+  static Future<TellerRequest> create(MessageCreateEvent event, User forUser,
+      firebase.FirebaseClient client, String rootDbUri) async {
+    var username = forUser.username;
+    var userId = forUser.id.id;
+    var request = new TellerRequest(username: username);
+    var uri = _firebaseDbUri(rootDbUri)
+        .replace(queryParameters: {'documentId': '$userId'});
+    await client.post(uri, {
+      'fields': request.toJson().map((k, v) {
+        return new MapEntry(k, _toFirebaseValue(v));
+      })
+    });
+    _firebaseIdExpando[request] = '$userId';
+    return request;
+  }
+
+  static Future<List<TellerRequest>> list(
+      firebase.FirebaseClient client, String rootDbUri) async {
+    var uri = _firebaseDbUri(rootDbUri);
+    dynamic result;
+    try {
+      result = await client.get(uri);
+    } on NotFoundException catch (_) {
+      return null;
+    } on firebase.FirebaseClientException catch (_) {
+      return null;
+    }
+    var docs = result['documents'] as Iterable<Map> ?? [];
+    return docs.map((doc) {
+      var request = new TellerRequest(
+          username: doc['fields']['username']['stringValue'] as String);
+      _firebaseIdExpando[request] = (doc['name'] as String).split('/').last;
+      return request;
+    }).toList();
+  }
+
+  static Future<TellerRequest> get(
+      firebase.FirebaseClient client, String rootDbUri, int discordId) async {
+    var uri = _firebaseDbUri(rootDbUri, subPath: '/$discordId');
+    dynamic result;
+    try {
+      result = await client.get(uri);
+    } on NotFoundException catch (_) {
+      return null;
+    } on firebase.FirebaseClientException catch (e) {
+      return null;
+    }
+    var request = new TellerRequest(
+        username: result['fields']['username']['stringValue'] as String);
+    _firebaseIdExpando[request] = '$discordId';
+    return request;
+  }
+
+  static Future<Null> delete(
+      firebase.FirebaseClient client, String rootDbUri, int discordId) async {
+    var uri = _firebaseDbUri(rootDbUri, subPath: '/$discordId');
+    try {
+      await client.delete(uri);
+    } on NotFoundException catch (_) {
+      return null;
+    } on firebase.FirebaseClientException catch (e) {
+      return null;
+    }
   }
 }
 
@@ -166,10 +366,14 @@ class Account extends Object with _$AccountSerializerMixin {
   static Uri _firebaseDbUri(String rootDbUri, {String subPath}) =>
       Uri.parse('$rootDbUri$_firebaseDbTable${subPath != null ? subPath : ''}');
 
-  static Future<Account> create(MessageCreateEvent event, User forUser,
-      firebase.FirebaseClient client, String rootDbUri) async {
+  static Future<Account> create(
+      MessageCreateEvent event,
+      User forUser,
+      firebase.FirebaseClient client,
+      String rootDbUri,
+      num newAccountCredit) async {
     var userId = forUser.id.id;
-    var account = new Account(balance: 100);
+    var account = new Account(balance: newAccountCredit);
     var uri = _firebaseDbUri(rootDbUri)
         .replace(queryParameters: {'documentId': '$userId'});
     await client.post(uri, {
@@ -190,6 +394,8 @@ class Account extends Object with _$AccountSerializerMixin {
     try {
       result = await client.get(uri);
     } on NotFoundException catch (_) {
+      return null;
+    } on firebase.FirebaseClientException catch (e) {
       return null;
     }
     var account = new Account(

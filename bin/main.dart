@@ -36,7 +36,7 @@ Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, 'hades-star-a1bff');
+  final bank = new Bank(firebaseClient, 'hades-star-a1bff', 1.5, 100);
   client.onMessage.listen((event) async {
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);
@@ -44,12 +44,12 @@ Future<DiscordClient> run() async {
     args.removeAt(0);
 
     if (command == '!help') {
-      await help(event, queues.keys);
+      await help(event); //, queues.keys);
     } else if (command == '!tidy') {
       await tidy(event, args);
-    } else if (queues.containsKey(command)) {
-      var queue = queues[command];
-      await queue.handleCommand(args, event);
+      // } else if (queues.containsKey(command)) {
+      //   var queue = queues[command];
+      //   await queue.handleCommand(args, event);
     } else if (Bank.commands.contains(command)) {
       await bank.handleCommand(command, args, event);
     }

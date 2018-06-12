@@ -6,6 +6,14 @@ part of 'bank.dart';
 // Generator: JsonSerializableGenerator
 // **************************************************************************
 
+TellerRequest _$TellerRequestFromJson(Map<String, dynamic> json) =>
+    new TellerRequest(username: json['username'] as String);
+
+abstract class _$TellerRequestSerializerMixin {
+  String get username;
+  Map<String, dynamic> toJson() => <String, dynamic>{'username': username};
+}
+
 Account _$AccountFromJson(Map<String, dynamic> json) =>
     new Account(balance: json['balance'] as num);
 

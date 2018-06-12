@@ -12,9 +12,10 @@ main() async {
     done = new Completer();
     DiscordClient discordClient;
 
-    discordClient = await runZoned(run, onError: (e) async {
+    discordClient = await runZoned(run, onError: (e, s) async {
       if (e is! WebSocketException) {
         print(e);
+        print(s);
         return;
       }
       try {
@@ -34,7 +35,7 @@ Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, 'macvault-5e930');
+  final bank = new Bank(firebaseClient, 'macvault-5e930', 1.0, 75.0);
   client.onMessage.listen((event) async {
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);
