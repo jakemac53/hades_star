@@ -35,8 +35,17 @@ Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, 'macvault-5e930', 1.0, 75.0);
+  final bank = new Bank(firebaseClient, 'macvault-5e930', 1.0, 75.0,
+      new User('macvault', '', new Snowflake(455897532506046467)),
+      branchManagerId: 288393614520877057);
   client.onMessage.listen((event) async {
+    // Supermoon art bank channel.
+    if (event.channel.id.id != 456047681639415819) return;
+    // Blargbot
+    if (event.author.id.id == 134133271750639616) {
+      await event.message.delete();
+      return;
+    }
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);
     var command = args[0];

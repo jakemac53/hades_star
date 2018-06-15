@@ -36,7 +36,8 @@ Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, 'hades-star-a1bff', 1.5, 100);
+  final bank = new Bank(firebaseClient, 'hades-star-a1bff', 1.5, 100,
+      new User('macvault', '', new Snowflake(455897532506046467)));
   client.onMessage.listen((event) async {
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);

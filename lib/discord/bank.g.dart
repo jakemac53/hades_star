@@ -7,19 +7,25 @@ part of 'bank.dart';
 // **************************************************************************
 
 TellerRequest _$TellerRequestFromJson(Map<String, dynamic> json) =>
-    new TellerRequest(username: json['username'] as String);
+    new TellerRequest(
+        username: json['username'] as String,
+        message: json['message'] as String);
 
 abstract class _$TellerRequestSerializerMixin {
   String get username;
-  Map<String, dynamic> toJson() => <String, dynamic>{'username': username};
+  String get message;
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{'username': username, 'message': message};
 }
 
-Account _$AccountFromJson(Map<String, dynamic> json) =>
-    new Account(balance: json['balance'] as num);
+Account _$AccountFromJson(Map<String, dynamic> json) => new Account(
+    balance: json['balance'] as num, username: json['username'] as String);
 
 abstract class _$AccountSerializerMixin {
   num get balance;
-  Map<String, dynamic> toJson() => <String, dynamic>{'balance': balance};
+  String get username;
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{'balance': balance, 'username': username};
 }
 
 Transaction _$TransactionFromJson(Map<String, dynamic> json) => new Transaction(
