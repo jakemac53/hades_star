@@ -6,29 +6,9 @@ import 'package:firebase/firebase_io.dart' as firebase;
 import 'package:hades_simulator/discord.dart';
 
 main() async {
-  Completer<Null> done;
-  while (true) {
-    print('Connecting: ${new DateTime.now()}');
-    done = new Completer();
-    DiscordClient discordClient;
-
-    discordClient = await runZoned(run, onError: (e, s) async {
-      if (e is! WebSocketException) {
-        print(e);
-        print(s);
-        return;
-      }
-      try {
-        await discordClient?.disconnect();
-      } catch (_) {}
-      print('Disconnected: ${new DateTime.now()}');
-      await new Future.delayed(new Duration(seconds: 15));
-      done.complete();
-    });
-    print('Connected: ${new DateTime.now()}');
-    // block until we get errors, then restart the client;
-    await done.future;
-  }
+  print('Connecting: ${new DateTime.now()}');
+  await run();
+  print('Connected: ${new DateTime.now()}');
 }
 
 Future<DiscordClient> run() async {
