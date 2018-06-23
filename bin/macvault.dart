@@ -37,6 +37,10 @@ Future<DiscordClient> run() async {
       await tidy(event, args);
     } else if (Bank.commands.contains(command)) {
       await bank.handleCommand(command, args, event);
+    } else {
+      var message =
+          await event.message.reply('Unrecognized command `$command`');
+      new Future.delayed(new Duration(seconds: 15), message.delete);
     }
   });
 

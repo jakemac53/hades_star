@@ -15,7 +15,7 @@ final artifactSalvageValues = [
   1600,
   2000,
   2400,
-  2400,
+  // 2400,
 ];
 
 final _firebaseIdExpando = new Expando<String>();
@@ -135,6 +135,7 @@ class Bank {
           var price = artifactCoinValues[i].toStringAsFixed(2);
           message.writeln('**rs${i + 1}**: $price MacBucks');
         }
+        message.writeln('Market rate for all other artifacts.');
         await event.message.reply(message.toString());
         break;
       case '!teller':
@@ -144,6 +145,10 @@ class Bank {
         await teller.handleBankerCommand(
             args.first, args.skip(1).toList(), event);
         break;
+      default:
+        var message =
+            await event.message.reply('Unrecognized command `$command`');
+        new Future.delayed(new Duration(seconds: 15), message.delete);
     }
   }
 
@@ -188,6 +193,7 @@ class Teller {
   Future<Null> handleCommand(
       String command, List<String> args, MessageCreateEvent event) async {
     Message response;
+    var timeout = new Duration(seconds: 300);
     switch (command) {
       case 'list':
         response = await listRequests(event);
@@ -224,13 +230,17 @@ class Teller {
         break;
       case 'accounts':
         response = await listAccounts(event);
+        break;
+      default:
+        response = await event.message.reply('Unrecognized command `$command`');
+        timeout = new Duration(seconds: 30);
+        break;
     }
 
     if (response != null) {
       try {
         new Future.delayed(new Duration(seconds: 5), event.message.delete);
       } catch (_) {}
-      var timeout = new Duration(seconds: 300);
       new Future.delayed(timeout, response.delete);
     }
   }
@@ -238,6 +248,7 @@ class Teller {
   Future<Null> handleBankerCommand(
       String command, List<String> args, MessageCreateEvent event) async {
     Message response;
+    var timeout = new Duration(seconds: 300);
     if (event.author.id.id != branchManagerId) {
       response = await event.message
           .reply('You don\'t have permission to execute this command!');
@@ -247,6 +258,11 @@ class Teller {
           await Transaction.create(args, event, _client, _rootDbUri,
               from: _botUser);
           break;
+        default:
+          response =
+              await event.message.reply('Unrecognized command `$command`');
+          timeout = new Duration(seconds: 30);
+          break;
       }
     }
 
@@ -254,7 +270,6 @@ class Teller {
       try {
         new Future.delayed(new Duration(seconds: 5), event.message.delete);
       } catch (_) {}
-      var timeout = new Duration(seconds: 300);
       new Future.delayed(timeout, response.delete);
     }
   }
@@ -600,7 +615,7 @@ class Transaction extends Object with _$TransactionSerializerMixin {
       return null;
     }
 
-    await event.message.reply(
+    var statusMessage = await event.message.reply(
         'Transferring $amount MacBucks from ${from.mention} to ${to.mention}...');
     var transaction = new Transaction(
         from: from.id.id,
@@ -615,7 +630,7 @@ class Transaction extends Object with _$TransactionSerializerMixin {
     _firebaseIdExpando[transaction] = result['name'] as String;
     await toAccount.changeBalance(amount, client, rootDbUri);
     await fromAccount.changeBalance(-amount, client, rootDbUri);
-    await event.message.reply('Transaction successful!\n'
+    await statusMessage.edit('Transaction successful!\n'
         '${from.mention}\'s balance: ${fromAccount.balance} MacBucks\n'
         '${to.mention}\'s balance: ${toAccount.balance} MacBucks');
     return transaction;
