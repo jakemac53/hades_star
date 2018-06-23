@@ -12,10 +12,11 @@ main() async {
 }
 
 Future<DiscordClient> run() async {
+  var dbname = await new File('macvault_db.txt').readAsString();
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, 'macvault-5e930', 1.0, 75.0,
+  final bank = new Bank(firebaseClient, dbname, 1.0, 75.0,
       new User('macvault', '', new Snowflake(455897532506046467)),
       branchManagerId: 288393614520877057);
   client.onMessage.listen((event) async {
