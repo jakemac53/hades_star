@@ -12,5 +12,5 @@ dev_dependencies:
   built_template:
     path: ./built_template
 dependency_overrides:
-  dartsicord:
-    git: https://github.com/voximity/dartsicord.git
+  dartsicord: 0.1.1+1
+    # git: https://github.com/voximity/dartsicord.git

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dartsicord/dartsicord.dart';
-import 'package:firebase/firebase_io.dart' as firebase;
+// import 'package:firebase/firebase_io.dart' as firebase;
 import 'package:hades_simulator/discord.dart';
 
 main() async {
@@ -34,7 +34,7 @@ main() async {
 Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
-  final firebaseClient = new firebase.FirebaseClient.anonymous();
+  // final firebaseClient = new firebase.FirebaseClient.anonymous();
   // final bank = new Bank(firebaseClient, 'hades-star-a1bff', 1.5, 100,
   //     new User('macvault', '', new Snowflake(455897532506046467)));
   client.onMessage.listen((event) async {

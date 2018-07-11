@@ -12,7 +12,7 @@ main() async {
 }
 
 Future<DiscordClient> run() async {
-  var dbname = await new File('macvault_db.txt').readAsString();
+  var dbname = await new File('bin/macvault_db.txt').readAsString();
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
@@ -29,7 +29,7 @@ Future<DiscordClient> run() async {
     }
     if (!event.message.content.startsWith('!')) return;
     var args = event.message.content.split(whiteSpaceRegex);
-    var command = args[0];
+    var command = args[0].toLowerCase();
     args.removeAt(0);
 
     if (command == '!help') {

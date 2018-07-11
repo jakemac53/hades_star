@@ -15,6 +15,8 @@ final artifactSalvageValues = [
   1600,
   2000,
   2400,
+  // Artificially inflated
+  6000,
   // 2400,
 ];
 
@@ -67,7 +69,7 @@ class Bank {
 
   Future<Null> handleCommand(
       String command, List<String> args, MessageCreateEvent event) async {
-    switch (command) {
+    switch (command.toLowerCase()) {
       case '!new_account':
         if (event.message.mentions.isNotEmpty) {
           for (var newUser in event.message.mentions) {
@@ -83,8 +85,7 @@ class Bank {
         Future printBalance(User user) async {
           var account = await Account.get(_client, _rootDbUri, user.id.id);
           if (account == null) {
-            await event.message
-                .reply('No account found for ${event.author.mention}');
+            await event.message.reply('No account found for ${user.mention}');
           } else {
             await event.message.reply(
                 '${user.mention} your balance is ${account.balance} MacBucks');
@@ -107,8 +108,9 @@ class Bank {
               'Expected one or two arguments, the lvl of artifact and the amount');
           return;
         }
-        var lvl = int.tryParse(
-            args.first.startsWith('rs') ? args.first.substring(2) : args.first);
+        var lvl = int.tryParse(args.first.toLowerCase().startsWith('rs')
+            ? args.first.substring(2)
+            : args.first);
         if (lvl == null) {
           await event.message.reply(
               'Expected a number (artifact level) but got ${args.first}');
@@ -194,7 +196,7 @@ class Teller {
       String command, List<String> args, MessageCreateEvent event) async {
     Message response;
     var timeout = new Duration(seconds: 300);
-    switch (command) {
+    switch (command.toLowerCase()) {
       case 'list':
         response = await listRequests(event);
         break;
@@ -253,7 +255,7 @@ class Teller {
       response = await event.message
           .reply('You don\'t have permission to execute this command!');
     } else {
-      switch (command) {
+      switch (command.toLowerCase()) {
         case 'transfer':
           await Transaction.create(args, event, _client, _rootDbUri,
               from: _botUser);
@@ -458,7 +460,7 @@ class Account extends Object with _$AccountSerializerMixin {
 
   static Future<List<Account>> list(
       firebase.FirebaseClient client, String rootDbUri) async {
-    var uri = _firebaseDbUri(rootDbUri);
+    var uri = _firebaseDbUri(rootDbUri + '?pageSize=100&orderBy=balance');
     dynamic result;
     try {
       result = await client.get(uri);
