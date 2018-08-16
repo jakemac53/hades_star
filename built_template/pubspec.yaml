@@ -1,3 +1,0 @@
-name: built_template
-dependencies:
-  build: ^0.12.5

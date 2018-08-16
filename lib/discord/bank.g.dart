@@ -3,13 +3,13 @@
 part of 'bank.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
-TellerRequest _$TellerRequestFromJson(Map<String, dynamic> json) =>
-    new TellerRequest(
-        username: json['username'] as String,
-        message: json['message'] as String);
+TellerRequest _$TellerRequestFromJson(Map<String, dynamic> json) {
+  return TellerRequest(
+      username: json['username'] as String, message: json['message'] as String);
+}
 
 abstract class _$TellerRequestSerializerMixin {
   String get username;
@@ -18,8 +18,10 @@ abstract class _$TellerRequestSerializerMixin {
       <String, dynamic>{'username': username, 'message': message};
 }
 
-Account _$AccountFromJson(Map<String, dynamic> json) => new Account(
-    balance: json['balance'] as num, username: json['username'] as String);
+Account _$AccountFromJson(Map<String, dynamic> json) {
+  return Account(
+      balance: json['balance'] as num, username: json['username'] as String);
+}
 
 abstract class _$AccountSerializerMixin {
   num get balance;
@@ -28,11 +30,14 @@ abstract class _$AccountSerializerMixin {
       <String, dynamic>{'balance': balance, 'username': username};
 }
 
-Transaction _$TransactionFromJson(Map<String, dynamic> json) => new Transaction(
-    from: json['from'] as int,
-    to: json['to'] as int,
-    amount: json['amount'] as num,
-    date: json['date'] == null ? null : DateTime.parse(json['date'] as String));
+Transaction _$TransactionFromJson(Map<String, dynamic> json) {
+  return Transaction(
+      from: json['from'] as int,
+      to: json['to'] as int,
+      amount: json['amount'] as num,
+      date:
+          json['date'] == null ? null : DateTime.parse(json['date'] as String));
+}
 
 abstract class _$TransactionSerializerMixin {
   int get from;

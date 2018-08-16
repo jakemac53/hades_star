@@ -3,13 +3,15 @@
 part of 'planet.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
-Planet _$PlanetFromJson(Map<String, dynamic> json) => new Planet(
-    x: (json['x'] as num)?.toDouble(),
-    y: (json['y'] as num)?.toDouble(),
-    firebaseId: json['firebaseId'] as String);
+Planet _$PlanetFromJson(Map<String, dynamic> json) {
+  return Planet(
+      x: (json['x'] as num)?.toDouble(),
+      y: (json['y'] as num)?.toDouble(),
+      firebaseId: json['firebaseId'] as String);
+}
 
 abstract class _$PlanetSerializerMixin {
   String get firebaseId;
