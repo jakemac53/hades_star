@@ -3,13 +3,15 @@
 part of 'asteroid.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
-Asteroid _$AsteroidFromJson(Map<String, dynamic> json) => new Asteroid(
-    x: (json['x'] as num)?.toDouble(),
-    y: (json['y'] as num)?.toDouble(),
-    firebaseId: json['firebaseId'] as String);
+Asteroid _$AsteroidFromJson(Map<String, dynamic> json) {
+  return Asteroid(
+      x: (json['x'] as num)?.toDouble(),
+      y: (json['y'] as num)?.toDouble(),
+      firebaseId: json['firebaseId'] as String);
+}
 
 abstract class _$AsteroidSerializerMixin {
   String get firebaseId;

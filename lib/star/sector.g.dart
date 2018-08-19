@@ -3,14 +3,16 @@
 part of 'sector.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
-Sector _$SectorFromJson(Map<String, dynamic> json) => new Sector(
-    x: (json['x'] as num)?.toDouble(),
-    y: (json['y'] as num)?.toDouble(),
-    name: json['name'] as String,
-    firebaseId: json['firebaseId'] as String);
+Sector _$SectorFromJson(Map<String, dynamic> json) {
+  return Sector(
+      x: (json['x'] as num)?.toDouble(),
+      y: (json['y'] as num)?.toDouble(),
+      name: json['name'] as String,
+      firebaseId: json['firebaseId'] as String);
+}
 
 abstract class _$SectorSerializerMixin {
   String get firebaseId;

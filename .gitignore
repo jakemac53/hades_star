@@ -4,6 +4,7 @@ build/
 pubspec.lock
 .vscode
 web/firebase.json
+web/star.g.dart
 bin/client_token.txt
 bin/macvault_client_token.txt
 bin/macvault_db.txt
