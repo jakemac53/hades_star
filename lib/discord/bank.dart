@@ -16,7 +16,7 @@ final artifactSalvageValues = [
   2000,
   2400,
   // Artificially inflated
-  6000,
+  4800,
   // 2400,
 ];
 
@@ -460,7 +460,8 @@ class Account extends Object with _$AccountSerializerMixin {
 
   static Future<List<Account>> list(
       firebase.FirebaseClient client, String rootDbUri) async {
-    var uri = _firebaseDbUri(rootDbUri + '?pageSize=100&orderBy=balance');
+    var uri =
+        _firebaseDbUri(rootDbUri, subPath: '?pageSize=100&orderBy=balance');
     dynamic result;
     try {
       result = await client.get(uri);
