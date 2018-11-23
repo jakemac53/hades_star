@@ -394,7 +394,8 @@ class TellerRequest extends Object with _$TellerRequestSerializerMixin {
     } on firebase.FirebaseClientException catch (_) {
       return null;
     }
-    var docs = result['documents'] as Iterable<Map> ?? [];
+    var docs =
+        ((result['documents'] as List) ?? []).cast<Map<String, dynamic>>();
     return docs.map((doc) {
       var request = new TellerRequest(
           username: doc['fields']['username']['stringValue'] as String,
@@ -470,7 +471,8 @@ class Account extends Object with _$AccountSerializerMixin {
     } on firebase.FirebaseClientException catch (_) {
       return null;
     }
-    var docs = result['documents'] as Iterable<Map> ?? [];
+    var docs =
+        ((result['documents'] as List) ?? []).cast<Map<String, dynamic>>();
     return docs.map((doc) {
       var account = new Account(
           balance: doc['fields']['balance']['doubleValue'] as num ??

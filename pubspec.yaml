@@ -11,5 +11,7 @@ dev_dependencies:
   json_serializable: any
   built_html: ^0.1.0
 dependency_overrides:
-  dartsicord: 0.1.1+1
+  dartsicord:
+    path: ../dartsicord
+  # dartsicord: 0.1.1+1
     # git: https://github.com/voximity/dartsicord.git
