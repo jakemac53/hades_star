@@ -301,15 +301,13 @@ class Teller {
   Future<String> newRequest(User user, String message,
       {int branchManagerId}) async {
     var existing = await TellerRequest.get(_client, _rootDbUri, user.id.id);
+    var response = '${user.mention} is requesting $message.';
     if (existing != null) {
-      return '${user.mention} already has an outstanding teller request, '
-          'you must delete that request before making a new one!';
-    } else {
-      await TellerRequest.create(user, message, _client, _rootDbUri);
-      var branchManagerMention =
-          branchManagerId == null ? '' : '<@$branchManagerId>';
-      return 'Hey $branchManagerMention! ${user.mention} is requesting $message.';
+      await TellerRequest.delete(_client, _rootDbUri, user.id.id);
+      response += ' Deleted existing request.';
     }
+    await TellerRequest.create(user, message, _client, _rootDbUri);
+    return response;
   }
 
   Future<String> cancel(User user) async {
