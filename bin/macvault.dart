@@ -31,6 +31,11 @@ Future<DiscordClient> run() async {
     var args = event.message.content.split(whiteSpaceRegex);
     var command = args[0].toLowerCase();
     args.removeAt(0);
+    // Allow a space between the `!` and the next command.
+    if (command == '!') {
+      command += args[0].toLowerCase();
+      args.removeAt(0);
+    }
 
     if (command == '!help') {
       await bank.help(event);
