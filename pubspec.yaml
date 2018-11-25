@@ -10,6 +10,7 @@ dev_dependencies:
   dartsicord: ^0.1.1
   json_serializable: any
   built_html: ^0.1.0
+  path: any
 dependency_overrides:
   dartsicord:
     path: ../dartsicord

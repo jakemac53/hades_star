@@ -9,3 +9,4 @@ bin/client_token.txt
 bin/macvault_client_token.txt
 bin/macvault_db.txt
 *.snapshot
+release/
