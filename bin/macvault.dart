@@ -17,11 +17,14 @@ Future<DiscordClient> run() async {
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
   final bank = new Bank(firebaseClient, dbname, 1.0, 75.0,
-      new User('macvault', '', new Snowflake(455897532506046467)),
-      branchManagerId: 288393614520877057);
+      new User('macvault', '', new Snowflake(455897532506046467)));
   client.onMessage.listen((event) async {
+    var supportedChannels = [
+      456047681639415819,
+      519133051788197888,
+    ];
     // Supermoon art bank channel.
-    if (event.channel.id.id != 456047681639415819) return;
+    if (!supportedChannels.contains(event.channel.id.id)) return;
     // Blargbot
     if (event.author.id.id == 134133271750639616) {
       await event.message.delete();
@@ -39,8 +42,6 @@ Future<DiscordClient> run() async {
 
     if (command == '!help') {
       await bank.help(event);
-    } else if (command == '!tidy') {
-      await tidy(event, args);
     } else if (Bank.commands.contains(command)) {
       await bank.handleCommand(command, args, event);
     } else {

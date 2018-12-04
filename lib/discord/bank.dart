@@ -15,9 +15,9 @@ final artifactSalvageValues = [
   1600,
   2000,
   2400,
-  // Artificially inflated
+  // Artificially inflated 8s and 9s
   4800,
-  // 2400,
+  19200,
 ];
 
 final _firebaseIdExpando = new Expando<String>();
@@ -124,6 +124,11 @@ class Bank {
                 .reply('Expected a number of artifacts but got ${args[1]}');
             return;
           }
+        }
+        if (lvl >= artifactCoinValues.length) {
+          await event.message.reply('Expected an artifact level from '
+              '1 - ${artifactCoinValues.length} but got ${args[0]}');
+          return;
         }
         var price = amount * artifactCoinValues[lvl - 1];
         await event.message.reply(
@@ -605,6 +610,10 @@ class Transaction extends Object with _$TransactionSerializerMixin {
     var amount = double.tryParse(args.first) ?? double.tryParse(args[1]);
     from ??= event.message.author;
     var to = event.message.mentions.first;
+    if (from.id.id == to.id.id) {
+      await event.message.reply('You can\'t transfer to yourself cheater!');
+      return null;
+    }
     var fromAccount = await Account.get(client, rootDbUri, from.id.id);
     if (fromAccount == null) {
       await event.message.reply('${from.mention} does not have an account!\n'
