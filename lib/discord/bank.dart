@@ -125,7 +125,7 @@ class Bank {
             return;
           }
         }
-        if (lvl >= artifactCoinValues.length) {
+        if (lvl > artifactCoinValues.length) {
           await event.message.reply('Expected an artifact level from '
               '1 - ${artifactCoinValues.length} but got ${args[0]}');
           return;
