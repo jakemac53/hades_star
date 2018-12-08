@@ -14,10 +14,10 @@ final artifactSalvageValues = [
   1200,
   1600,
   2000,
-  2400,
+  3200,
   // Artificially inflated 8s and 9s
   4800,
-  19200,
+  25600,
 ];
 
 final _firebaseIdExpando = new Expando<String>();
