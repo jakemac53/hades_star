@@ -5,7 +5,9 @@ import 'package:dartsicord/dartsicord.dart';
 import 'package:firebase/firebase_io.dart' as firebase;
 import 'package:hades_simulator/discord.dart';
 
-final queuesByChannel = <String, StarQueue>{};
+// final queues = <String, StarQueue>{
+//   '!rs6': StarQueue(Role)
+// };
 
 main() async {
   Completer<Null> done;

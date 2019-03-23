@@ -17,7 +17,7 @@ final artifactSalvageValues = [
   3200,
   // Artificially inflated 8s and 9s
   4800,
-  25600,
+  13600,
 ];
 
 final _firebaseIdExpando = new Expando<String>();
@@ -539,6 +539,7 @@ class Account extends Object with _$AccountSerializerMixin {
       num difference, firebase.FirebaseClient client, String rootDbUri) async {
     var uri = _firebaseDbUri(rootDbUri, subPath: '/$firebaseId');
     balance += difference;
+    balance = double.parse(balance.toStringAsFixed(2));
     await client.patch(uri, {
       'fields': toJson().map((k, v) {
         return new MapEntry(k, _toFirebaseValue(v));
