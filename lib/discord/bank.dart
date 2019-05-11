@@ -16,8 +16,9 @@ final artifactSalvageValues = [
   2000,
   3200,
   // Artificially inflated 8s and 9s
+  // Number should be desired price * 160
   4800,
-  13600,
+  11200,
 ];
 
 final _firebaseIdExpando = new Expando<String>();
