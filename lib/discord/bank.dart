@@ -7,20 +7,6 @@ import 'package:firebase/firebase_io.dart' as firebase;
 
 part 'bank.g.dart';
 
-final artifactSalvageValues = [
-  160,
-  400,
-  800,
-  1200,
-  1600,
-  2000,
-  3200,
-  // Artificially inflated 8s and 9s
-  // Number should be desired price * 160
-  4800,
-  11200,
-];
-
 final _firebaseIdExpando = new Expando<String>();
 
 class Bank {
@@ -40,17 +26,8 @@ class Bank {
 
   final User botUser;
 
-  List<num> get artifactCoinValues {
-    var values = <num>[1];
-    for (var i = 1; i < artifactSalvageValues.length; i++) {
-      var salvageValue = artifactSalvageValues[i];
-      var prevSalvageValue = artifactSalvageValues[i - 1];
-      var prevCoinValue = values[i - 1];
-      var rate = salvageValue * profitRatio / prevSalvageValue;
-      values.add(prevCoinValue * rate);
-    }
-    return values;
-  }
+  Future<List<num>> fetchArtifactCoinValues() =>
+      Prices.list(_client, _rootDbUri);
 
   final firebase.FirebaseClient _client;
 
@@ -126,21 +103,23 @@ class Bank {
             return;
           }
         }
-        if (lvl > artifactCoinValues.length) {
+        var prices = await fetchArtifactCoinValues();
+        if (lvl > prices.length) {
           await event.message.reply('Expected an artifact level from '
-              '1 - ${artifactCoinValues.length} but got ${args[0]}');
+              '1 - ${prices.length} but got ${args[0]}');
           return;
         }
-        var price = amount * artifactCoinValues[lvl - 1];
+        var price = amount * prices[lvl - 1];
         await event.message.reply(
             'I recommend a price of ${price.toStringAsFixed(2)} MacBucks '
             'for $amount rs$lvl artifacts');
         break;
       case '!price_chart':
+        var prices = await fetchArtifactCoinValues();
         var message = new StringBuffer('The prices are as follows:');
         message.writeln();
-        for (var i = 0; i < artifactCoinValues.length; i++) {
-          var price = artifactCoinValues[i].toStringAsFixed(2);
+        for (var i = 0; i < prices.length; i++) {
+          var price = prices[i].toStringAsFixed(2);
           message.writeln('**rs${i + 1}**: $price MacBucks');
         }
         message.writeln('Market rate for all other artifacts.');
@@ -650,3 +629,23 @@ class Transaction extends Object with _$TransactionSerializerMixin {
     return transaction;
   }
 }
+
+class Prices {
+  static String get _firebaseDbTable => '/prices';
+  static String get _firebaseDocumentId => 'all';
+  static Uri _firebaseDbUri(String rootDbUri) =>
+      Uri.parse('$rootDbUri$_firebaseDbTable/$_firebaseDocumentId');
+
+  static Future<List<num>> list(
+      firebase.FirebaseClient client, String rootDbUri) async {
+    var result = await client.get(_firebaseDbUri(rootDbUri));
+    return (result['fields']['values']['arrayValue']['values'] as List)
+        .cast<Map>()
+        .map(readNumValue)
+        .toList();
+  }
+}
+
+num readNumValue(Map firebaseObject) =>
+    firebaseObject['doubleValue'] as num ??
+    int.tryParse(firebaseObject['integerValue'] as String);
