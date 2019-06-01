@@ -16,7 +16,7 @@ Future<DiscordClient> run() async {
   final whiteSpaceRegex = new RegExp(r'\s+');
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
-  final bank = new Bank(firebaseClient, dbname, 1.0, 75.0,
+  final bank = new Bank(firebaseClient, dbname, 1.0, 300.0,
       new User('macvault', '', new Snowflake(455897532506046467)));
   client.onMessage.listen((event) async {
     var supportedChannels = [
