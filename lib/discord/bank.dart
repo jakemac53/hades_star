@@ -245,6 +245,24 @@ class Teller {
           await Transaction.create(args, event, _client, _rootDbUri,
               from: _botUser);
           break;
+        case 'print':
+          if (args.length != 1) {
+            response = await event.message.reply(
+                'Expected exactly one argument (an amount) but got $args');
+            break;
+          }
+          var amount = double.tryParse(args.first);
+          if (amount == null) {
+            response = await event.message
+                .reply('Expected an amount as a number but got ${args.first}');
+          }
+          var vaultAccount =
+              await Account.get(_client, _rootDbUri, _botUser.id.id);
+          var oldBalance = vaultAccount.balance;
+          await vaultAccount.changeBalance(amount, _client, _rootDbUri);
+          await event.message.reply(
+              'Printed $amount, new vault balance is ${vaultAccount.balance} (was $oldBalance)');
+          break;
         default:
           response =
               await event.message.reply('Unrecognized command `$command`');

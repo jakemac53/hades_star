@@ -17,7 +17,8 @@ Future<DiscordClient> run() async {
   final client = new DiscordClient();
   final firebaseClient = new firebase.FirebaseClient.anonymous();
   final bank = new Bank(firebaseClient, dbname, 1.0, 300.0,
-      new User('macvault', '', new Snowflake(455897532506046467)));
+      new User('macvault', '', new Snowflake(455897532506046467)),
+      branchManagerId: 432378251856576515);
   client.onMessage.listen((event) async {
     var supportedChannels = [
       456047681639415819,
